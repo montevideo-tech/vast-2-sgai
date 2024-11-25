@@ -7,7 +7,8 @@ This demo shows how to use interstitials with HLS.js.
 Serve 'interstitials-demo' directory in a local server.
 
 ``` bash
-npx http-server . --port 5500
+npm install
+npm run start
 ```
 
 # HLS.js Tests
@@ -77,4 +78,39 @@ https://bitdash-a.akamaihd.net/content/sintel/hls/video/800kbit/seq-3.ts
 .
 .
 #EXT-X-ENDLIST
+```
+
+## Use #EXT-X-DEFINE:QUERYPARAM
+Added #EXT-X-DEFINE:QUERYPARAM to the Multivariant Playlist and the Playlists, and it worked as expected. Using this approach, we can send any query parameter we want to the VAST-2-SGAI
+
+
+Result: ✅ Worked as expected.
+
+``` main.m3u8
+#EXTM3U
+#EXT-X-DEFINE:QUERYPARAM="user"
+#EXT-X-DEFINE:QUERYPARAM="content"
+
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="stereo",LANGUAGE="en",NAME="English",DEFAULT=YES,AUTOSELECT=YES,URI="audio/stereo/en/128kbit.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="stereo",LANGUAGE="dubbing",NAME="Dubbing",DEFAULT=NO,AUTOSELECT=YES,URI="audio/stereo/none/128kbit.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="surround",LANGUAGE="dubbing",NAME="Dubbing",DEFAULT=NO,AUTOSELECT=YES,URI="audio/stereo/none/128kbit.m3u8"
+
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=831270,CODECS="avc1.4d4015,mp4a.40.2",AUDIO="stereo",RESOLUTION=638x272
+video/800kbit.m3u8?user={$user}&content={$content}
+
+#EXT-X-ENDLIST
+```
+
+``` 800kbit.m3u8
+#EXTM3U
+#EXT-X-MEDIA-SEQUENCE:0
+#EXT-X-TARGETDURATION:2
+#EXT-X-DEFINE:QUERYPARAM="user"
+#EXT-X-DEFINE:QUERYPARAM="content"
+
+#EXT-X-DATERANGE:ID="ad1",CLASS="com.apple.hls.interstitial",START-DATE="2024-11-13T13:55:05.000Z",DURATION=45.000,X-ASSET-LIST="/assets/ads/ads.json?user={$user}&content={$content}",X-RESUME-OFFSET=0,X-RESTRICT="SKIP,JUMP"
+
+#EXT-X-PROGRAM-DATE-TIME:2024-11-13T13:55:00.000Z
+...
+
 ```

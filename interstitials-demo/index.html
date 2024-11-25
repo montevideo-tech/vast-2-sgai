@@ -70,7 +70,7 @@
       console.log('INTERSTITIAL_ASSET_ERROR', data);
     });
 
-    hls.loadSource('http://127.0.0.1:5500/assets/main.m3u8');
+    hls.loadSource('/assets/main.m3u8?user=1234&content=abc');
 
     hls.attachMedia(video);
 
