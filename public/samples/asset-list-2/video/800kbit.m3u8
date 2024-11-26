@@ -4,7 +4,7 @@
 #EXT-X-DEFINE:QUERYPARAM="user"
 #EXT-X-DEFINE:QUERYPARAM="content"
 
-#EXT-X-DATERANGE:ID="ad1",CLASS="com.apple.hls.interstitial",START-DATE="2024-11-13T13:55:05.000Z",DURATION=45.000,X-ASSET-LIST="/assets/ads/ads.json?user={$user}&content={$content}",X-RESUME-OFFSET=0,X-RESTRICT="SKIP,JUMP"
+#EXT-X-DATERANGE:ID="ad1",CLASS="com.apple.hls.interstitial",START-DATE="2024-11-13T13:55:05.000Z",DURATION=45.000,X-ASSET-LIST="/api/samples/asset-list-2?user={$user}&content={$content}",X-RESUME-OFFSET=0,X-RESTRICT="SKIP,JUMP"
 
 #EXT-X-PROGRAM-DATE-TIME:2024-11-13T13:55:00.000Z
 #EXTINF:2,

@@ -6,10 +6,6 @@ This demo shows how to use interstitials with HLS.js.
 
 Serve 'interstitials-demo' directory in a local server.
 
-``` bash
-npm install
-npm run start
-```
 
 # HLS.js Tests
 

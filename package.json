@@ -1,0 +1,42 @@
+{
+  "name": "vast-2-sgai",
+  "version": "0.0.1",
+  "description": "A SGAI Proxy service",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/montevideo-tech/vast-2-sgai.git"
+  },
+  "keywords": [
+    "SGAI",
+    "HLS",
+    "Ad",
+    "insertion",
+    "HLS",
+    "Interstitials",
+    "MPEG-DASH"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/montevideo-tech/vast-2-sgai/issues"
+  },
+  "homepage": "https://github.com/montevideo-tech/vast-2-sgai#readme",
+  "dependencies": {
+    "@dailymotion/vast-client": "github:montevideo-tech/vast-client-js",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "m": "^1.9.0",
+    "pino": "^9.5.0",
+    "pino-http": "^10.3.0",
+    "pino-pretty": "^13.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
