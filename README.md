@@ -12,6 +12,21 @@ This project aims to create an open-source tool that converts VAST XML files int
 **Start Date:** November 11  
 **End Date:** January 31  
 
+
+## How to run
+1. Start the project
+
+    With Node:
+    ```
+    npm install
+    npm run dev
+    ```
+    or  Docker Compose
+    ```
+    docker compose up
+    ```
+2. Open a browser in `http://localhost:3000` to try the examples
+
 ## Communication Channels
 
 - **[video-dev.org](https://video-dev.org)**: Join us on the `#montevideo-summerprojects` channel to discuss the project, share updates, and collaborate.
@@ -41,9 +56,7 @@ During each meeting:
 
 ## Documentation
 
-- **Project Status Document**: A detailed document covering the project’s current status, meeting minutes, and agreements on scope and design is available [here](https://docs.google.com/document/d/1Ajc1A8z68RJB5SKwm3_SSI51j1K5_9gZkHAd5AuXydI/edit?pli=1&tab=t.0#heading=h.23xzkfs6hfwz).
-
-- **Digital Whiteboard**: A visual tool used during meetings to support discussions can be accessed [here](https://drive.google.com/file/d/1MPodWl1R3DhgWXG54HC3dLo7qD7aTzZT/view?usp=sharing).
+**Digital Whiteboard**: A visual tool used during meetings to support discussions can be accessed [here](https://drive.google.com/file/d/1MPodWl1R3DhgWXG54HC3dLo7qD7aTzZT/view?usp=sharing).
 
 ---
 
