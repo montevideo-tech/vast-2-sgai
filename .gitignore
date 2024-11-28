@@ -1,0 +1,11 @@
+# MacOS
+.DS_Store
+
+# VSCode custom workspace settings
+.vscode/settings.json
+
+# Build output
+dist
+
+# npm
+node_modules/*

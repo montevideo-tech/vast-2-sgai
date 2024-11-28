@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  vast-2-sgai:
+    build: .
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app # Mount the current directory to the container
+      - /usr/src/app/node_modules # Avoid mounting the node_modules locally
+    ports:
+      - "3000:3000"
+    command: >
+      sh -c "npm install && npm run dev"
+    environment:
+      NODE_ENV: development 
