@@ -1,21 +1,14 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors'); 
-const pino = require('pino');
-const pinoHttp = require('pino-http');
-const samples = require('./routes/samples.js')
-const api = require('./routes/api.js')
 
-const logger = pino({
-  level: 'debug',
-  transport: {
-    target: 'pino-pretty'
-  }
-});
-const httpLogger = pinoHttp({ logger });
+const samples = require('./routes/samples.js')
+const api = require('./routes/api.js');
+const {httpLogger, logger} = require('./utils/logger.js');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
