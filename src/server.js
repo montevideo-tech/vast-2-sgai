@@ -3,6 +3,8 @@ const path = require('path');
 const cors = require('cors'); 
 const pino = require('pino');
 const pinoHttp = require('pino-http');
+const samples = require('./routes/samples.js')
+const api = require('./routes/api.js')
 
 const logger = pino({
   level: 'debug',
@@ -17,11 +19,8 @@ const PORT = 3000;
 
 app.use(cors());
 
-const samples = require('./routes/samples.js')
-//const assetList = require('./routes/asset-list.js')
-
-app.use('/api/samples/', httpLogger, samples);
-//app.use('/api/asset-list/', httpLogger, assetList);
+app.use('/samples/', httpLogger, samples);
+app.use('/api/', httpLogger, api);
 
 // Static samples
 app.use(express.static(path.join(__dirname, '../public')));
