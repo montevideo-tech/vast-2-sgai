@@ -9,3 +9,5 @@ dist
 
 # npm
 node_modules/*
+
+.env

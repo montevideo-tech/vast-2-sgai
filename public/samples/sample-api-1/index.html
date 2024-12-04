@@ -1,5 +1,5 @@
 <head>
-  <title>Sample VAST 1</title>
+  <title>Sample API 1</title>
   <script src="../../hls.js/hls.js"></script>
   <style>
     video {
@@ -11,9 +11,13 @@
 </head>
 
 <body>
-  <h1>Sample VAST 1</h1>
+  <h1>Sample API 1</h1>
   <p>HLS, interstitial@5sec, 1 ad parsed form <a href="vast-sample.xml">this Google IMA VAST example</a></p>
-
+  <p>JWT Secret: 251450bcd828e761eca58b28a4e15e9aa8fdc7e42579e8f9492303d0bbd10b21</p>
+  <p>JWT: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAvc2FtcGxlcy9zYW1wbGUtYXBpLTEvdmFzdC1zYW1wbGUueG1sP3Rlc3Q9dHJ1ZSIsImlhdCI6MTczMzM1NDM1NSwiZXhwIjo0ODg5MTE0MzU1fQ.iK8l2A9VLjgN25aCkFq7XNgvnjR7UuxgY8L9gKI-RHE</p>
+  <p>Use <a target="_blank" href="https://jwt.io/">jwt.io</a> to decode the JWT</p>
+  <p>API Call: <a href="/api/asset-list?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAvc2FtcGxlcy9zYW1wbGUtYXBpLTEvdmFzdC1zYW1wbGUueG1sP3Rlc3Q9dHJ1ZSIsImlhdCI6MTczMzM1NDM1NSwiZXhwIjo0ODg5MTE0MzU1fQ.iK8l2A9VLjgN25aCkFq7XNgvnjR7UuxgY8L9gKI-RHE&test=false&user=1234&content=abcd">try out</a></p>
+  
   <video id="video" controls></video>
 
   <script>

@@ -29,6 +29,7 @@
   "homepage": "https://github.com/montevideo-tech/vast-2-sgai#readme",
   "dependencies": {
     "@dailymotion/vast-client": "github:montevideo-tech/vast-client-js",
+    "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
