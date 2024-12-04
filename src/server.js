@@ -1,27 +1,19 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors'); 
-const pino = require('pino');
-const pinoHttp = require('pino-http');
 
-const logger = pino({
-  level: 'debug',
-  transport: {
-    target: 'pino-pretty'
-  }
-});
-const httpLogger = pinoHttp({ logger });
+const samples = require('./routes/samples.js')
+const api = require('./routes/api.js');
+const {httpLogger, logger} = require('./utils/logger.js');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-const samples = require('./routes/samples.js')
-//const assetList = require('./routes/asset-list.js')
-
-app.use('/api/samples/', httpLogger, samples);
-//app.use('/api/asset-list/', httpLogger, assetList);
+app.use('/samples/', httpLogger, samples);
+app.use('/api/', httpLogger, api);
 
 // Static samples
 app.use(express.static(path.join(__dirname, '../public')));

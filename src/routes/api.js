@@ -1,0 +1,52 @@
+// routes/api.js
+require('dotenv').config();
+const express = require('express');
+const bodyParser = require('body-parser')
+
+const getVideoManifests = require('../utils/vast-parser.js');
+const getListMPD = require('../utils/list-mpd-generator.js');
+const { signJWT, middlewareJWTQuery } = require('../utils/jwt.js');
+const updateQueryParams = require('../utils/replace-queryparams.js');
+
+const API_DISABLE_SIGN = process.env.API_DISABLE_SIGN == 'true';
+
+const router = express.Router();
+
+async function getAds(req, manifestType){
+  //remove jwt form the query params
+  const { jwt, ...queryParams } = req.query;
+  const finalUrl = updateQueryParams(req.jwtPayload.url, queryParams)
+  req.log.debug(`initial VAST URL : ${req.jwtPayload.url}`)
+  req.log.debug(`final VAST URL: ${finalUrl}`)
+  return await getVideoManifests(finalUrl, manifestType);
+}
+
+// HLS Asset List
+router.get('/asset-list', middlewareJWTQuery, async (req, res) => {
+  const ads = await getAds(req, "m3u8");
+  const assetList= { "ASSETS": []};
+  ads.forEach(ad => {
+    assetList.ASSETS.push({
+      URI: ad.fileURL,
+      DURATION: ad.duration
+    });
+  });
+  res.json(assetList);
+});
+
+// MPEG-DASH MPD List
+router.get('/list-mpd', middlewareJWTQuery, async (req, res) => {
+  const ads = await getAds(req, "mpd");
+  res.set('Content-Type', 'application/dash+xml');
+  res.send(getListMPD(ads));
+});
+
+// Sign JWT
+router.all('/sign', bodyParser.json(), (req, res) =>{
+  if (API_DISABLE_SIGN) res.status(401).json({ error: 'API disabled' })
+  const url = req.body.url || req.query.url
+  if (!url) res.status(400).json({error:'You must send the "url" as a query parameter when using GET or include it in the JSON body when using POST.'})
+  res.send(signJWT({url}))
+})
+
+module.exports = router;

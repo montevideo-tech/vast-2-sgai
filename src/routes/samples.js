@@ -1,7 +1,8 @@
 // routes/subroutes.js
 const express = require('express');
-const router = express.Router();
 const VAST = require('@dailymotion/vast-client');
+
+const router = express.Router();
 
 // Basic Asset List
 router.get('/asset-list-1', (req, res) => {
