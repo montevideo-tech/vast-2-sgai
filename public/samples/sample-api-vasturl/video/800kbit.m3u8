@@ -4,7 +4,7 @@
 #EXT-X-DEFINE:QUERYPARAM="user"
 #EXT-X-DEFINE:QUERYPARAM="content"
 
-#EXT-X-DATERANGE:ID="ad1",CLASS="com.apple.hls.interstitial",START-DATE="2024-11-13T13:55:05.000Z",DURATION=45.000,X-ASSET-LIST="/api/asset-list?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAvc2FtcGxlcy9zYW1wbGUtYXBpLTEvdmFzdC1zYW1wbGUueG1sP3Rlc3Q9dHJ1ZSIsImlhdCI6MTczMzM1NDM1NSwiZXhwIjo0ODg5MTE0MzU1fQ.iK8l2A9VLjgN25aCkFq7XNgvnjR7UuxgY8L9gKI-RHE&test=false&user={$user}&content={$content}",X-RESUME-OFFSET=0,X-RESTRICT="SKIP,JUMP"
+#EXT-X-DATERANGE:ID="ad1",CLASS="com.apple.hls.interstitial",START-DATE="2024-11-13T13:55:05.000Z",DURATION=45.000,X-ASSET-LIST="/api/asset-list?vasturl=http://localhost:3000/samples/sample-vast-1/vast-sample.xml&test=false&user={$user}&content={$content}",X-RESUME-OFFSET=0,X-RESTRICT="SKIP,JUMP"
 
 #EXT-X-PROGRAM-DATE-TIME:2024-11-13T13:55:00.000Z
 #EXTINF:2,

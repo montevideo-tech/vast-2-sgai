@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({path: 'src/.env'});
 const jwt = require('jsonwebtoken');
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -7,6 +7,7 @@ const EXPIRES_IN = process.env.JWT_EXPIRES_IN || '100y';
 
 function signJWT(payload, options = {}){
     const opt = {...options, expiresIn: EXPIRES_IN };
+    console.log(SECRET_KEY)
     return jwt.sign(payload, SECRET_KEY, opt);
 }
 
