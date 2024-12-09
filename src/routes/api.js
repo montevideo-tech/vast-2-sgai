@@ -16,10 +16,19 @@ const API_DISABLE_SIGN = process.env.API_DISABLE_SIGN == 'true';
 const router = express.Router();
 
 async function getAds(req, manifestType){
-  //remove jwt form the query params
-  const { jwt, vasturl, ...queryParams } = req.query;
-  const finalUrl = updateQueryParams(jwt || vasturl, queryParams)
-  req.log.debug(`initial VAST URL : ${jwt || vasturl}`)
+  //remove all the reserved params from the query params
+  const { jwt, vasturl, vastidurl, vastid, ...queryParams } = req.query;
+
+  let jwturl = '';
+  if(req.jwtPayload){
+    jwturl = req.jwtPayload.url;
+  }
+
+  //get the url from decoded jwt, plain vasturl or vastid mapping
+  const url = jwturl || vasturl || vastidurl;
+  
+  const finalUrl = updateQueryParams(url, queryParams)
+  req.log.debug(`initial VAST URL : ${url}`)
   req.log.debug(`final VAST URL: ${finalUrl}`)
   return await getVideoManifests(finalUrl, manifestType);
 }
