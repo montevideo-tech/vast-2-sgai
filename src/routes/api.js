@@ -8,21 +8,33 @@ const getListMPD = require('../utils/list-mpd-generator.js');
 const { signJWT, middlewareJWTQuery } = require('../utils/jwt.js');
 const updateQueryParams = require('../utils/replace-queryparams.js');
 
+const { originWhitelistMiddleware } = require('../middlewares/whitelist.js');
+const { paramsMiddleware } = require('../middlewares/params.js');
+
 const API_DISABLE_SIGN = process.env.API_DISABLE_SIGN == 'true';
 
 const router = express.Router();
 
 async function getAds(req, manifestType){
-  //remove jwt form the query params
-  const { jwt, ...queryParams } = req.query;
-  const finalUrl = updateQueryParams(req.jwtPayload.url, queryParams)
-  req.log.debug(`initial VAST URL : ${req.jwtPayload.url}`)
+  //remove all the reserved params from the query params
+  const { jwt, vasturl, vastidurl, vastid, ...queryParams } = req.query;
+
+  let jwturl = '';
+  if(req.jwtPayload){
+    jwturl = req.jwtPayload.url;
+  }
+
+  //get the url from decoded jwt, plain vasturl or vastid mapping
+  const url = jwturl || vasturl || vastidurl;
+  
+  const finalUrl = updateQueryParams(url, queryParams)
+  req.log.debug(`initial VAST URL : ${url}`)
   req.log.debug(`final VAST URL: ${finalUrl}`)
   return await getVideoManifests(finalUrl, manifestType);
 }
 
 // HLS Asset List
-router.get('/asset-list', middlewareJWTQuery, async (req, res) => {
+router.get('/asset-list', originWhitelistMiddleware, paramsMiddleware , async (req, res) => {
   const ads = await getAds(req, "m3u8");
   const assetList= { "ASSETS": []};
   ads.forEach(ad => {
