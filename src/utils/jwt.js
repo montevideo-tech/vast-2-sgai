@@ -30,21 +30,20 @@ function middlewareJWTHeader(req, res, next) {
         req.jwtPayload = getJWT(token);
         next();
     } catch (error) {
-        res.status(403).json({ error: 'Invalid token' });
+        return res.status(403).json({ error: 'Invalid token' });
     }
 }
 
 function middlewareJWTQuery(req, res, next) {
     const token = req.query.jwt
     if(!token) return res.status(401).json({ error: 'jwt query parameter not found' });
-    
     try {
         req.jwtPayload = getJWT(token);
     } catch (error) {
-        res.status(403).json({ error: 'Invalid token' });
+        return res.status(403).json({ error: 'Invalid token' });
     }
 
-    if (!req.jwtPayload.url) res.status(401).json({ error: 'url not found in jwt' });
+    if (!req.jwtPayload.url) return res.status(401).json({ error: 'url not found in jwt' });
 
     next();
 }
