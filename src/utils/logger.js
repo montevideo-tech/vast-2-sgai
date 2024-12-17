@@ -4,9 +4,11 @@ const pinoHttp = require("pino-http");
 
 const logger = pino({
   level: process.env.PINO_LOG_LEVEL || "info",
-  transport: {
-    target: "pino-pretty",
-  },
+  ...(process.env.PINO_LOG_LEVEL === "debug" ? {
+    transport: {
+      target: "pino-pretty",
+    },
+  } : {})
 });
 
 const httpLogger = pinoHttp({

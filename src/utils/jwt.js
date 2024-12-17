@@ -27,7 +27,7 @@ function middlewareJWTHeader(req, res, next) {
   try {
     req.jwtPayload = getJWT(token);
     next();
-  } catch (error) {
+  } catch {
     return res.status(403).json({ error: "Invalid token" });
   }
 }
@@ -39,7 +39,7 @@ function middlewareJWTQuery(req, res, next) {
     return res.status(401).json({ error: "jwt query parameter not found" });
   try {
     req.jwtPayload = getJWT(token);
-  } catch (error) {
+  } catch {
     return res.status(403).json({ error: "Invalid token" });
   }
 

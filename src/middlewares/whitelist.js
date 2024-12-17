@@ -1,6 +1,9 @@
 require("dotenv").config({ path: "src/.env" });
-const vastWhitelist = process.env.VAST_WHITELIST || "";
-const originWhitelist = process.env.ORIGIN_WHITELIST || "";
+
+const {
+  VAST_WHITELIST: vastWhitelist = "",
+  ORIGIN_WHITELIST: originWhitelist = ""
+} = process.env;
 
 function vastServerWhitelistMiddleware(req, res, next) {
   const { vasturl } = req.query;
@@ -15,9 +18,7 @@ function vastServerWhitelistMiddleware(req, res, next) {
 
   try {
     const hostname = new URL(vasturl).hostname;
-    console.log("hostname:", hostname);
     const isAllowedVast = vastWhitelist.split(",").includes(hostname);
-    console.log("VAST Allowed?:", isAllowedVast);
 
     if (isAllowedVast) {
       return next();
@@ -26,14 +27,13 @@ function vastServerWhitelistMiddleware(req, res, next) {
         .status(403)
         .json({ message: "Forbidden: VAST URL not allowed" });
     }
-  } catch (error) {
+  } catch {
     return res.status(400).json({ message: "Bad Request: Invalid VAST URL" });
   }
 }
 
 function originWhitelistMiddleware(req, res, next) {
   const origin = req.headers.origin;
-  console.log("originWhitelist:", originWhitelist);
 
   if (originWhitelist === "") {
     return next();
@@ -56,7 +56,7 @@ function originWhitelistMiddleware(req, res, next) {
         .status(403)
         .json({ message: "Forbidden: Origin host not allowed" });
     }
-  } catch (error) {
+  } catch {
     return res
       .status(400)
       .json({ message: "Bad Request: Invalid Origin header" });

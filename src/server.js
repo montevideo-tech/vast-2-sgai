@@ -12,8 +12,8 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-app.use("/samples/", httpLogger, samples);
 app.use("/api/", httpLogger, api);
+app.use("/api/samples/", httpLogger, samples);
 
 // Static samples
 app.use(express.static(path.join(__dirname, "../public")));
