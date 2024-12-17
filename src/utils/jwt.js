@@ -7,7 +7,6 @@ const EXPIRES_IN = process.env.JWT_EXPIRES_IN || "100y";
 
 function signJWT(payload, options = {}) {
   const opt = { ...options, expiresIn: EXPIRES_IN };
-  logger.info(SECRET_KEY);
   return jwt.sign(payload, SECRET_KEY, opt);
 }
 
@@ -28,7 +27,7 @@ function middlewareJWTHeader(req, res, next) {
   try {
     req.jwtPayload = getJWT(token);
     next();
-  } catch (error) {
+  } catch {
     return res.status(403).json({ error: "Invalid token" });
   }
 }
@@ -40,7 +39,7 @@ function middlewareJWTQuery(req, res, next) {
     return res.status(401).json({ error: "jwt query parameter not found" });
   try {
     req.jwtPayload = getJWT(token);
-  } catch (error) {
+  } catch {
     return res.status(403).json({ error: "Invalid token" });
   }
 

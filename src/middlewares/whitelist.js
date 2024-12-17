@@ -1,5 +1,4 @@
 require("dotenv").config({ path: "src/.env" });
-const { logger } = require("../utils/logger.js");
 
 const {
   VAST_WHITELIST: vastWhitelist = "",
@@ -19,11 +18,7 @@ function vastServerWhitelistMiddleware(req, res, next) {
 
   try {
     const hostname = new URL(vasturl).hostname;
-
-    logger.info("hostname: " + hostname);
     const isAllowedVast = vastWhitelist.split(",").includes(hostname);
-    logger.info(vastWhitelist);
-    logger.info("VAST Allowed?: " + isAllowedVast);
 
     if (isAllowedVast) {
       return next();
@@ -32,14 +27,13 @@ function vastServerWhitelistMiddleware(req, res, next) {
         .status(403)
         .json({ message: "Forbidden: VAST URL not allowed" });
     }
-  } catch (error) {
+  } catch {
     return res.status(400).json({ message: "Bad Request: Invalid VAST URL" });
   }
 }
 
 function originWhitelistMiddleware(req, res, next) {
   const origin = req.headers.origin;
-  logger.info("originWhitelist: " + originWhitelist);
 
   if (originWhitelist === "") {
     return next();
@@ -62,7 +56,7 @@ function originWhitelistMiddleware(req, res, next) {
         .status(403)
         .json({ message: "Forbidden: Origin host not allowed" });
     }
-  } catch (error) {
+  } catch {
     return res
       .status(400)
       .json({ message: "Bad Request: Invalid Origin header" });

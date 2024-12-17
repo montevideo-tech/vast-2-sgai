@@ -17,6 +17,7 @@ const router = express.Router();
 
 async function getAds(req, manifestType) {
   //remove all the reserved params from the query params
+  // eslint-disable-next-line no-unused-vars
   const { jwt, vasturl, vastidurl, vastid, ...queryParams } = req.query;
 
   let jwturl = "";
