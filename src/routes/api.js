@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 
 const getVideoManifests = require("../utils/vast-parser.js");
 const getListMPD = require("../utils/list-mpd-generator.js");
-const { signJWT, middlewareJWTQuery } = require("../utils/jwt.js");
+const { signJWT } = require("../utils/jwt.js");
 const updateQueryParams = require("../utils/replace-queryparams.js");
 
 const { originWhitelistMiddleware } = require("../middlewares/whitelist.js");
@@ -46,17 +46,22 @@ router.get(
         URI: ad.fileURL,
         DURATION: ad.duration,
       });
+      res.json(assetList);
     });
-    res.json(assetList);
   }
 );
 
 // MPEG-DASH MPD List
-router.get("/list-mpd", middlewareJWTQuery, async (req, res) => {
-  const ads = await getAds(req, "mpd");
-  res.set("Content-Type", "application/dash+xml");
-  res.send(getListMPD(ads));
-});
+router.get(
+  "/list-mpd",
+  originWhitelistMiddleware,
+  paramsMiddleware,
+  async (req, res) => {
+    const ads = await getAds(req, "mpd");
+    res.set("Content-Type", "application/dash+xml");
+    res.send(getListMPD(ads));
+  }
+);
 
 // Sign JWT
 router.all("/sign", bodyParser.json(), (req, res) => {
