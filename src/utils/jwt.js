@@ -7,7 +7,6 @@ const EXPIRES_IN = process.env.JWT_EXPIRES_IN || "100y";
 
 function signJWT(payload, options = {}) {
   const opt = { ...options, expiresIn: EXPIRES_IN };
-  logger.info(SECRET_KEY);
   return jwt.sign(payload, SECRET_KEY, opt);
 }
 
