@@ -1,6 +1,10 @@
 require("dotenv").config({ path: "src/.env" });
-const vastWhitelist = process.env.VAST_WHITELIST || "";
-const originWhitelist = process.env.ORIGIN_WHITELIST || "";
+const { logger } = require("../utils/logger.js");
+
+const {
+  VAST_WHITELIST: vastWhitelist = "",
+  ORIGIN_WHITELIST: originWhitelist = ""
+} = process.env;
 
 function vastServerWhitelistMiddleware(req, res, next) {
   const { vasturl } = req.query;
@@ -15,9 +19,11 @@ function vastServerWhitelistMiddleware(req, res, next) {
 
   try {
     const hostname = new URL(vasturl).hostname;
-    console.log("hostname:", hostname);
+
+    logger.info("hostname: " + hostname);
     const isAllowedVast = vastWhitelist.split(",").includes(hostname);
-    console.log("VAST Allowed?:", isAllowedVast);
+    logger.info(vastWhitelist);
+    logger.info("VAST Allowed?: " + isAllowedVast);
 
     if (isAllowedVast) {
       return next();
@@ -33,7 +39,7 @@ function vastServerWhitelistMiddleware(req, res, next) {
 
 function originWhitelistMiddleware(req, res, next) {
   const origin = req.headers.origin;
-  console.log("originWhitelist:", originWhitelist);
+  logger.info("originWhitelist: " + originWhitelist);
 
   if (originWhitelist === "") {
     return next();

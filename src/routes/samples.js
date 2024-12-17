@@ -1,6 +1,7 @@
 // routes/subroutes.js
 const express = require("express");
 const VAST = require("@dailymotion/vast-client");
+const { logger } = require("../utils/logger.js");
 
 const router = express.Router();
 
@@ -40,10 +41,10 @@ router.get("/sample-vast-1", async (req, res) => {
     "http://localhost:3000/samples/sample-vast-1/vast-sample.xml"
   );
 
-  console.log(parsedVast);
-  console.log(parsedVast.ads[0]);
-  console.log(parsedVast.ads[0].creatives[0]);
-  console.log(parsedVast.ads[0].creatives[0].mediaFiles[4]);
+  logger.info(parsedVast);
+  logger.info(parsedVast.ads[0]);
+  logger.info(parsedVast.ads[0].creatives[0]);
+  logger.info(parsedVast.ads[0].creatives[0].mediaFiles[4]);
 
   const fileURL = parsedVast.ads[0].creatives[0].mediaFiles[4].fileURL;
   const duration = parsedVast.ads[0].creatives[0].duration;
