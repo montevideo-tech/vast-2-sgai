@@ -9,7 +9,7 @@ const VAST = require("@dailymotion/vast-client");
  */
 async function getVideoManifests(vastUrl, manifestType) {
   const vastClient = new VAST.VASTClient();
-  const parsedVast = await vastClient.get(vastUrl);
+  const parsedVast = await vastClient.get(vastUrl, { resolveAll: true });
 
   const result = [];
 
@@ -28,7 +28,11 @@ async function getVideoManifests(vastUrl, manifestType) {
                 mediaFile.fileURL &&
                 mediaFile.fileURL.includes(manifestType)
               ) {
-                result.push({ fileURL: mediaFile.fileURL, duration });
+                result.push({
+                  fileURL: mediaFile.fileURL,
+                  duration,
+                  trackingEvents: creative.trackingEvents,
+                });
               }
             }
           }
@@ -36,6 +40,7 @@ async function getVideoManifests(vastUrl, manifestType) {
       }
     }
   }
+
   return result;
 }
 

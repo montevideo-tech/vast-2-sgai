@@ -11,6 +11,8 @@ const updateQueryParams = require("../utils/replace-queryparams.js");
 const { originWhitelistMiddleware } = require("../middlewares/whitelist.js");
 const { paramsMiddleware } = require("../middlewares/params.js");
 
+const { AdCreativeSignalingMapper } = require("../trackingEvents/tracking-events.js");
+
 const API_DISABLE_SIGN = process.env.API_DISABLE_SIGN == "true";
 
 const router = express.Router();
@@ -34,6 +36,13 @@ async function getAds(req, manifestType) {
   return await getVideoManifests(finalUrl, manifestType);
 }
 
+function mapAdCreativeSignaling(ad, trackingEvents) {
+  const mapper = new AdCreativeSignalingMapper(ad, trackingEvents);
+  const mappedTrackingEvents = mapper.map();
+
+  return mappedTrackingEvents;
+}
+
 // HLS Asset List
 router.get(
   "/asset-list",
@@ -42,13 +51,34 @@ router.get(
   async (req, res) => {
     const ads = await getAds(req, "m3u8");
     const assetList = { ASSETS: [] };
+
     ads.forEach((ad) => {
+      const trackingEvents = mapAdCreativeSignaling(ad, ad.trackingEvents);
       assetList.ASSETS.push({
         URI: ad.fileURL,
         DURATION: ad.duration,
+        "X-AD-CREATIVE-SIGNALING": {
+          version: 2,
+          type: "slot",
+          payload: [
+            {
+              type: "linear",
+              start: 0.0,
+              duration: ad.duration,
+              identifiers: [
+                {
+                  scheme: "urn:com:example:ads:id",
+                  value: "972c79e1-2363-403e-9287-a0fa4323c389",
+                },
+              ],
+              tracking: trackingEvents,
+            },
+          ],
+        },
       });
-      res.json(assetList);
     });
+
+    res.json(assetList);
   }
 );
 
