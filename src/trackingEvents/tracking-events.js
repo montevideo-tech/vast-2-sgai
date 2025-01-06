@@ -1,3 +1,4 @@
+const { logger } = require("../utils/logger.js");
 const QUARTILE = "quartile";
 
 class TrackingEvent {
@@ -96,7 +97,7 @@ class AdCreativeSignalingMapper {
             urls: event.urls,
           };
         } catch (error) {
-          console.warn(`Skipping invalid event: ${eventType}, Error: ${error.message}`);
+          logger.warn(`Skipping invalid event: ${eventType}, Error: ${error.message}`);
           return null;
         }
       })
