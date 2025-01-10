@@ -58,4 +58,28 @@ router.get("/sample-vast-1", async (req, res) => {
   });
 });
 
+router.get("/sample-ad-signaling", async (req, res) => {
+  try {
+    const vastUrl =
+      "http://localhost:3000/api/asset-list?vasturl=http://localhost:3000/samples/sample-ad-signaling/vast-sample.xml";
+
+    const response = await fetch(vastUrl);
+
+    if (!response.ok) {
+      const errorMessage = `Failed to fetch VAST: HTTP ${response.status} - ${response.statusText}`;
+      logger.error(errorMessage);
+      return res.status(response.status).json({ error: errorMessage });
+    }
+
+    const parsedVast = await response.json();
+
+    return res.json(parsedVast);
+  } catch (error) {
+    logger.error("Error occurred while fetching VAST:", error);
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", details: error.message });
+  }
+});
+
 module.exports = router;
