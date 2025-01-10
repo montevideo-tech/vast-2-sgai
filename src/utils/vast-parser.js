@@ -1,5 +1,5 @@
 const VAST = require("@dailymotion/vast-client");
-
+const { logger } = require("./logger.js");
 /**
  * Fetches video manifests from a VAST URL.
  *
@@ -9,7 +9,16 @@ const VAST = require("@dailymotion/vast-client");
  */
 async function getVideoManifests(vastUrl, manifestType) {
   const vastClient = new VAST.VASTClient();
-  const parsedVast = await vastClient.get(vastUrl, { resolveAll: true });
+  let parsedVast;
+  try {
+    parsedVast = await vastClient.get(vastUrl, { resolveAll: true });
+  } catch (error) {
+    logger.error(
+      "Failed to fetch VAST XML",
+      error
+    );
+    throw new Error(error.message);
+  }
 
   const result = [];
 

@@ -49,9 +49,15 @@ router.get(
   originWhitelistMiddleware,
   paramsMiddleware,
   async (req, res) => {
-    const ads = await getAds(req, "m3u8");
+    let ads;
+    try {
+      ads = await getAds(req, "m3u8");
+    } catch (error) {
+      return res.status(400).json({
+        error: error.message,
+      });
+    }
     const assetList = { ASSETS: [] };
-
     ads.forEach((ad) => {
       const trackingEvents = mapAdCreativeSignaling(ad, ad.trackingEvents);
       assetList.ASSETS.push({
