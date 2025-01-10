@@ -15,7 +15,7 @@ Ensure you have the `hls` object initialized in your project before using this p
 Include the script for the Ad Creative Signaling Plugin in your project.
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/montevideo-tech/vast-2-sgai/ad-creative-signaling/hls.js/adCreativeSignalingPlugin.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/montevideo-tech/vast-2-sgai/hls.js/adCreativeSignalingPlugin.js"></script>
 ```
 
 ### Usage
