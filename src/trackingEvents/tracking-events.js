@@ -1,5 +1,6 @@
 const { logger } = require("../utils/logger.js");
 const QUARTILE = "quartile";
+const IMPRESSION = "impression";
 
 class TrackingEvent {
   constructor(type, duration, urls, start) {
@@ -11,32 +12,38 @@ class TrackingEvent {
 }
 
 class StartEvent extends TrackingEvent {
-  constructor(type, duration, urls) {
-    super(type, duration, urls, 0.0);
+  constructor(duration, urls) {
+    super(QUARTILE, duration, urls, 0.0);
   }
 }
 
 class FirstQuartileEvent extends TrackingEvent {
-  constructor(type, duration, urls) {
-    super(type, duration, urls, duration * 0.25);
+  constructor(duration, urls) {
+    super(QUARTILE, duration, urls, duration * 0.25);
   }
 }
 
 class MidpointEvent extends TrackingEvent {
-  constructor(type, duration, urls) {
-    super(type, duration, urls, duration * 0.5);
+  constructor(duration, urls) {
+    super(QUARTILE, duration, urls, duration * 0.5);
   }
 }
 
 class ThirdQuartileEvent extends TrackingEvent {
-  constructor(type, duration, urls) {
-    super(type, duration, urls, duration * 0.75);
+  constructor(duration, urls) {
+    super(QUARTILE, duration, urls, duration * 0.75);
   }
 }
 
 class CompleteEvent extends TrackingEvent {
-  constructor(type, duration, urls) {
-    super(type, duration, urls, duration);
+  constructor(duration, urls) {
+    super(QUARTILE, duration, urls, duration);
+  }
+}
+
+class ImpressionEvent extends TrackingEvent {
+  constructor(duration, urls) {
+    super(IMPRESSION, duration, urls, 0.0);
   }
 }
 
@@ -44,7 +51,7 @@ class ProgressEvent extends TrackingEvent {
   constructor(type, duration, urls, startValue) {
     const start =
       typeof startValue === "string" && startValue.includes("%")
-        ? duration * parseFloat(startValue.replace("%", "")) / 100
+        ? (duration * parseFloat(startValue.replace("%", ""))) / 100
         : parseFloat(startValue);
 
     if (isNaN(start) || start < 0 || start > duration) {
@@ -63,10 +70,11 @@ class TrackingEventFactory {
       midpoint: MidpointEvent,
       thirdQuartile: ThirdQuartileEvent,
       complete: CompleteEvent,
+      impression: ImpressionEvent,
     };
 
     if (eventType in eventMap) {
-      return new eventMap[eventType](QUARTILE, duration, urls);
+      return new eventMap[eventType](duration, urls);
     }
 
     if (eventType.startsWith("progress")) {
@@ -81,27 +89,39 @@ class TrackingEventFactory {
 }
 
 class AdCreativeSignalingMapper {
-  constructor(ad, trackingEvents) {
+  constructor(ad) {
     this.ad = ad;
-    this.trackingEvents = trackingEvents;
   }
 
   map() {
-    return Object.entries(this.trackingEvents)
+    const newTrackingEvents = this.ad.trackingEvents;
+    
+    if(this.ad?.impressions.length > 0)
+      newTrackingEvents[IMPRESSION] = this.ad.impressions.map((impression) => impression.url);
+
+    const trackingEvents = Object.entries(this.ad.trackingEvents)
       .map(([eventType, urls]) => {
         try {
-          const event = TrackingEventFactory.create(eventType, this.ad.duration, urls);
+          const event = TrackingEventFactory.create(
+            eventType,
+            this.ad.duration,
+            urls
+          );
           return {
             type: event.type,
             start: event.start,
             urls: event.urls,
           };
         } catch (error) {
-          logger.warn(`Skipping invalid event: ${eventType}, Error: ${error.message}`);
+          logger.warn(
+            `Skipping invalid event: ${eventType}, Error: ${error.message}`
+          );
           return null;
         }
       })
       .filter(Boolean);
+
+    return trackingEvents;
   }
 }
 
