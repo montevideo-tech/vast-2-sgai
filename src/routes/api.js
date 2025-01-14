@@ -71,12 +71,6 @@ router.get(
               type: "linear",
               start: 0.0,
               duration: ad.duration,
-              identifiers: [
-                {
-                  scheme: "urn:com:example:ads:id",
-                  value: "972c79e1-2363-403e-9287-a0fa4323c389",
-                },
-              ],
               tracking: trackingEvents,
             },
           ],
