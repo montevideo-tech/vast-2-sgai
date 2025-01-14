@@ -43,7 +43,7 @@ class CompleteEvent extends TrackingEvent {
 
 class ImpressionEvent extends TrackingEvent {
   constructor(duration, urls) {
-    super(IMPRESSION, duration, urls, 0.0);
+    super(IMPRESSION, duration, urls);
   }
 }
 
