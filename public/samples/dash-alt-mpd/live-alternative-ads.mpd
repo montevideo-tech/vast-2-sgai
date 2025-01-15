@@ -3,7 +3,7 @@
   <BaseURL>https://livesim.dashif.org/livesim2/scte35_2/testpic_2s/</BaseURL>
   <Period id="P0" start="PT0S">
     <EventStream xmlns="" schemeIdUri="urn:mpeg:dash:event:alternativeMPD:2022" timescale="1000">
-<Event presentationTime="10000" duration="20000">
+<Event presentationTime="10000" duration="10000">
   <AlternativeMPD uri="/api/list-mpd?vasturl=http://localhost:3000/samples/dash-alt-mpd/vast-sample.xml" earliestResolutionTimeOffset="5000" mode="replace" returnOffset="0"/>
 </Event>
 <Event presentationTime="40000" duration="5000">
