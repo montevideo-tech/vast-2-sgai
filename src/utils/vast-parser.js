@@ -29,7 +29,7 @@ async function getVideoManifests(vastUrl, manifestType) {
         for (let j = 0; j < ad.creatives.length; j++) {
           const creative = ad.creatives[j];
           const duration = creative.duration;
-
+          console.log(creative)
           if (creative.mediaFiles) {
             for (let k = 0; k < creative.mediaFiles.length; k++) {
               const mediaFile = creative.mediaFiles[k];
@@ -41,10 +41,16 @@ async function getVideoManifests(vastUrl, manifestType) {
                   fileURL: mediaFile.fileURL,
                   duration,
                   trackingEvents: creative.trackingEvents,
+                  videoClicks: {
+                    clickThrough: creative.videoClickThroughURLTemplate,
+                    clickTracking: creative.videoClickTrackingURLTemplates,
+                    customClick: creative.videoCustomClickURLTemplates
+                  }
                 });
               }
             }
           }
+ 
         }
       }
     }

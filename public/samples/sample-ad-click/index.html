@@ -1,0 +1,109 @@
+<head>
+  <title>Sample VAST 1</title>
+  <script src="../../hls.js/hls.js"></script>
+  <script src="../../hls.js/videoClicksPlugin.js"></script>
+  <style>
+    video {
+      height: 300px;
+      width: 533px;
+      background-color: black;
+    }
+    .ad-overlay {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 10px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      z-index: 9999;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Sample VAST with Ad Click Tracking</h1>
+  <p>HLS, interstitial@5sec, 1 ad parsed form <a href="vast-sample.xml">this Google IMA VAST example</a></p>
+
+  <div id="player-container">
+    <video id="video" controls></video>
+  </div>
+  <script>
+    if (Hls.isSupported()) {
+      var video = document.getElementById('video');
+      var hls = new Hls({
+        enableInterstitialPlayback: true,
+        interstitialAppendInPlace: true,
+        interstitialLiveLookAhead: 20
+      });
+
+
+      hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+        console.log(
+          'manifest loaded, found ' + data.levels.length + ' quality level',
+        );
+      });
+
+      hls.on(Hls.Events.INTERSTITIALS_UPDATED, (event, data) => {
+        console.log('INTERSTITIALS_UPDATED', data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIALS_BUFFERED_TO_BOUNDARY, (event, data) => {
+        console.log('INTERSTITIALS_BUFFERED_TO_BOUNDARY', data);
+        console.log("hls interstitialsManager", hls.interstitialsManager)
+      });
+
+      hls.on(Hls.Events.ASSET_LIST_LOADING, (event, data) => {
+        console.log('ASSET_LIST_LOADING', data);
+      });
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        console.log('ERROR', data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIAL_ASSET_PLAYER_CREATED, (event, data) => {
+        console.log('INTERSTITIAL_ASSET_PLAYER_CREATED', data);
+      });
+
+      hls.on(Hls.Events.ASSET_LIST_LOADED, (event, data) => {
+        console.log('ASSET_LIST_LOADED', data);
+      });
+      
+      hls.on(Hls.Events.INTERSTITIAL_STARTED, (event, data) => {
+        console.log('INTERSTITIAL_STARTED', data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIAL_ENDED, (event, data) => {
+        console.log('INTERSTITIAL_ENDED', data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIAL_ASSET_STARTED, (event, data) => {
+        console.log('INTERSTITIAL_ASSET_STARTED', data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIAL_ASSET_ENDED, (event, data) => {
+        console.log('INTERSTITIAL_ASSET_ENDED', data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIALS_PRIMARY_RESUMED, (event, data) => {
+        console.log('INTERSTITIALS_PRIMARY_RESUMED', data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIAL_ASSET_ERROR, (event, data) => {
+        console.log('INTERSTITIAL_ASSET_ERROR', data);
+      });
+
+      hls.loadSource('main.m3u8?user=1234&content=abc');
+
+      hls.attachMedia(video);
+
+      const videoClicksPlugin = new VideoClicksPlugin(hls, {
+            apiUrl: "http://localhost:3000/api/asset-list?vasturl=http%3A%2F%2Flocalhost%3A3000%2Fsamples%2Fsample-ad-signaling%2Fvast-sample.xml%3F&user=1234&content=abc&_HLS_primary_id=d9ac2bba-44f0-47e5-b948-ccbe26b92d8a",
+            container: document.getElementById("player-container"),
+            clickEventUrl: "http://localhost:8000/?event=ad-click"
+        });
+
+    }
+  </script>
+</body>

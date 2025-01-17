@@ -60,6 +60,13 @@ router.get(
     const assetList = { ASSETS: [] };
     ads.forEach((ad) => {
       const trackingEvents = mapAdCreativeSignaling(ad, ad.trackingEvents);
+      
+      const videoClicksSignaling = {
+        clickThrough: ad.videoClicks?.clickThrough,
+        clickTracking: ad.videoClicks?.clickTracking,
+        customClick: ad.videoClicks?.customClick,
+      };
+
       assetList.ASSETS.push({
         URI: ad.fileURL,
         DURATION: ad.duration,
@@ -81,6 +88,7 @@ router.get(
             },
           ],
         },
+        "X-VAST2SGAI-VIDEOCLICKS": videoClicksSignaling,
       });
     });
 
