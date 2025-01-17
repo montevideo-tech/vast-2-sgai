@@ -7,65 +7,199 @@
       width: 533px;
       background-color: black;
     }
+
+    .video-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    header {
+      padding: 1rem;
+      background-color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: center;
+    }
+
+    .project-name {
+      color: #63ba93;
+      text-align: center;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, -apple-system, system-ui, Segoe UI, Helvetica,
+        Arial, sans-serif;
+    }
+
+    #logo {
+      margin-right: auto;
+    }
+
+    .samples {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .samples a {
+      color: black;
+      font-weight: 500;
+    }
+
+    .samples a:hover {
+      color: #36b4a7;
+      transition: ease-in-out 250ms;
+    }
+
+    .samples h1 {
+      color: #36b4a7;
+    }
+
+    ul li:not(:last-child) {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 
 <body>
-  <h1>Sample dash.js AlternativeMPD with ListMPD + CMCD v2</h1>
-  <p>DASH + AlternativeMPD + ListMPD + CMCD v2, 1 ad parsed form <a href="vast-sample.xml">this VAST example</a></p>
-  <p>API Call: <a href="api/list-mpd?vasturl=http://localhost:3000/samples/dash-alt-mpd/vast-sample.xml">try out</a></p>
-  
-  <video id="video" controls></video>
+  <header>
+    <div class="header-container">
+      <a href="/">
+        <img
+          src="/logo.svg"
+          alt="Company Logo"
+          width="150"
+          height="50"
+          id="logo"
+        />
+      </a>
+      <h1 class="project-name">VAST-2-SGAI</h1>
+    </div>
+  </header>
+  <div class="samples">
+    <h1>Sample dash.js AlternativeMPD with ListMPD + CMCD v2</h1>
+    <p>
+      DASH + AlternativeMPD + ListMPD + CMCD v2, 1 ad parsed form
+      <a href="vast-sample.xml">this VAST example</a>
+    </p>
+    <p>
+      API Call:
+      <a
+        href="api/list-mpd?vasturl=http://localhost:3000/samples/dash-alt-mpd/vast-sample.xml"
+        >try out</a
+      >
+    </p>
+
+    <div class="video-container">
+      <video id="video" controls></video>
+    </div>
+  </div>
 
   <script>
-        /* possible modes of attach cmcd data */
-        var CMCD_MODE_QUERY = 'query'; /* as query parameters */
-        var CMCD_MODE_HEADER = 'header'; /* as HTTP headers */    
+    /* possible modes of attach cmcd data */
+    var CMCD_MODE_QUERY = "query"; /* as query parameters */
+    var CMCD_MODE_HEADER = "header"; /* as HTTP headers */
 
-        var video,
-            url = 'live-alternative-ads.mpd',
-            version;
+    var video,
+      url = "live-alternative-ads.mpd",
+      version;
 
-        player = dashjs.MediaPlayer().create();
-        video = document.querySelector('video');
-        player.initialize();
+    player = dashjs.MediaPlayer().create();
+    video = document.querySelector("video");
+    player.initialize();
 
-        player.updateSettings({
-            streaming: {
-                cmcd: {
-                    enabled: true, /* global enable reporting of cmcd parameters */
-                    version: 2, /* 1 is the default version */
-                    reporting: {
-                        requestMode: {
-                            enabled: true, /* enable cmcdv2 request mode */
-                            mode: CMCD_MODE_QUERY, /* overrides global mode */
-                        },
-                        responseMode: {
-                            enabled: true, /* enable cmcdv2 response mode. FALSE by default */
-                            mode: CMCD_MODE_QUERY, /* overrides global mode. JSON not supported */
-                            enabledKeys: ['sid', 'cid', 'ts', 'url', 'br', 'd', 'ot', 'tb', 'v', 'sta', 'ttfb', 'ttlb','rc'], /* optional, overrides global keys */
-                            requestUrl: 'http://' + window.location.hostname + ':3000/cmcd/response-mode', /*mandatory, URL to send report */
-                            requestMethod: 'POST', /*optional, get by default */
-                        },
-                        stateIntervalMode: {
-                            enabled: true, /* enable cmcdv2 state-interval mode. FALSE by default */
-                            mode: CMCD_MODE_QUERY, /*overrides global mode. JSON not supported */
-                            interval: 10000,  /* time in ms between regular requests. Default 30s or 0 to omit */
-                            enabledKeys: ['sta', 'sid', 'cid', 'sf', 'v', 'ltc', 'msd', 'sta'], /* Currently only supports: 'sta', 'ts', 'sid', 'cid', 'sf', 'v', 'lb', 'pr' */
-                            requestUrl: 'http://' + window.location.hostname + ':3000/cmcd/state-interval-mode', /* mandatory, URL to send report */
-                            requestMethod: 'POST',  /* optional, get by default */
-                        }
-                    },
-                    sid: 'b248658d-1d1a-4039-91d0-8c08ba597da5', /* session id send with each request */
-                    cid: '21cf726cfe3d937b5f974f72bb5bd06a', /* content id send with each request */
-                    mode: CMCD_MODE_QUERY, /* global mode if not specified in each mode */
-                    enabledKeys: ['br', 'd', 'ot', 'tb' , 'bl', 'dl', 'mtp', 'nor', 'nrr', 'su' , 'bs', 'rtp' , 'cid', 'pr', 'sf', 'sid', 'st', 'v', 'sta', 'ltc', 'msd', 'sta']
-                }
-            }
-        });
-        player.setAutoPlay(true);
-        player.attachView(video);
-        player.attachSource(url);
-    
+    player.updateSettings({
+      streaming: {
+        cmcd: {
+          enabled: true /* global enable reporting of cmcd parameters */,
+          version: 2 /* 1 is the default version */,
+          reporting: {
+            requestMode: {
+              enabled: true /* enable cmcdv2 request mode */,
+              mode: CMCD_MODE_QUERY /* overrides global mode */,
+            },
+            responseMode: {
+              enabled: true /* enable cmcdv2 response mode. FALSE by default */,
+              mode: CMCD_MODE_QUERY /* overrides global mode. JSON not supported */,
+              enabledKeys: [
+                "sid",
+                "cid",
+                "ts",
+                "url",
+                "br",
+                "d",
+                "ot",
+                "tb",
+                "v",
+                "sta",
+                "ttfb",
+                "ttlb",
+                "rc",
+              ] /* optional, overrides global keys */,
+              requestUrl:
+                "http://" +
+                window.location.hostname +
+                ":3000/cmcd/response-mode" /*mandatory, URL to send report */,
+              requestMethod: "POST" /*optional, get by default */,
+            },
+            stateIntervalMode: {
+              enabled: true /* enable cmcdv2 state-interval mode. FALSE by default */,
+              mode: CMCD_MODE_QUERY /*overrides global mode. JSON not supported */,
+              interval: 10000 /* time in ms between regular requests. Default 30s or 0 to omit */,
+              enabledKeys: [
+                "sta",
+                "sid",
+                "cid",
+                "sf",
+                "v",
+                "ltc",
+                "msd",
+                "sta",
+              ] /* Currently only supports: 'sta', 'ts', 'sid', 'cid', 'sf', 'v', 'lb', 'pr' */,
+              requestUrl:
+                "http://" +
+                window.location.hostname +
+                ":3000/cmcd/state-interval-mode" /* mandatory, URL to send report */,
+              requestMethod: "POST" /* optional, get by default */,
+            },
+          },
+          sid: "b248658d-1d1a-4039-91d0-8c08ba597da5" /* session id send with each request */,
+          cid: "21cf726cfe3d937b5f974f72bb5bd06a" /* content id send with each request */,
+          mode: CMCD_MODE_QUERY /* global mode if not specified in each mode */,
+          enabledKeys: [
+            "br",
+            "d",
+            "ot",
+            "tb",
+            "bl",
+            "dl",
+            "mtp",
+            "nor",
+            "nrr",
+            "su",
+            "bs",
+            "rtp",
+            "cid",
+            "pr",
+            "sf",
+            "sid",
+            "st",
+            "v",
+            "sta",
+            "ltc",
+            "msd",
+            "sta",
+          ],
+        },
+      },
+    });
+    player.setAutoPlay(true);
+    player.attachView(video);
+    player.attachSource(url);
   </script>
 </body>
