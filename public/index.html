@@ -1,18 +1,102 @@
 <head>
-    <title>VAST-2-SGAI</title>
+  <title>VAST-2-SGAI</title>
+  <style>
+    header {
+      padding: 1rem;
+      background-color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: center;
+    }
+
+    .project-name {
+      color: #63ba93;
+      text-align: center;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, -apple-system, system-ui, Segoe UI, Helvetica,
+        Arial, sans-serif;
+    }
+
+    #logo {
+      margin-right: auto;
+    }
+
+    .samples {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .samples a {
+      color: black;
+      font-weight: 500;
+      font-size: 1.2rem;
+    }
+
+    .samples a:hover {
+      color: #36b4a7;
+      transition: ease-in-out 250ms;
+    }
+
+    .samples h1 {
+      color: #36b4a7;
+    }
+
+    ul li:not(:last-child) {
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 
 <body>
-    <h1>VAST-2-SGAI</h1>    
-    <div class="samples">
-       <p><a href="samples/asset-list-1">Asset List 1</a></p>  
-       <p><a href="samples/asset-list-2/">Asset List 2</a></p>
-       <p><a href="samples/sample-vast-1/">Sample VAST Parsing 1</a></p>
-       <p><a href="samples/sample-api-jwt/">Sample API JWT</a></p>
-       <p><a href="samples/sample-api-vasturl/">Sample API VAST URL</a></p>
-       <p><a href="samples/sample-api-vastid/">Sample API VAST ID</a></p>
-       <p><a href="samples/sample-ad-signaling/">Sample VAST with Tracking Events to Ad Creative Signaling</a></p>
-       <p><a href="samples/dash-alt-mpd/">dash.js + AlterantiveMPD + ListMPD</a></p>
-
-    </div> 
+  <header>
+    <div class="header-container">
+      <img
+        src="/logo.svg"
+        alt="Company Logo"
+        width="150"
+        height="50"
+        id="logo"
+      />
+      <h1 class="project-name">VAST-2-SGAI</h1>
+    </div>
+  </header>
+  <div class="samples">
+    <h1>Demo Showcase</h1>
+    <ul>
+      <li>
+        <a href="samples/asset-list-1">Asset List 1</a>
+      </li>
+      <li>
+        <a href="samples/asset-list-2/">Asset List 2</a>
+      </li>
+      <li>
+        <a href="samples/sample-vast-1/">Sample VAST Parsing 1</a>
+      </li>
+      <li>
+        <a href="samples/sample-api-jwt/">Sample API JWT</a>
+      </li>
+      <li>
+        <a href="samples/sample-api-vasturl/">Sample API VAST URL</a>
+      </li>
+      <li>
+        <a href="samples/sample-api-vastid/">Sample API VAST ID</a>
+      </li>
+      <li>
+        <a href="samples/sample-ad-signaling/"
+          >Sample VAST with Tracking Events to Ad Creative Signaling</a
+        >
+      </li>
+      <li>
+        <a href="samples/dash-alt-mpd/">dash.js + AlterantiveMPD + ListMPD</a>
+      </li>
+    </ul>
+  </div>
 </body>
