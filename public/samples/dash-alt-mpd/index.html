@@ -147,7 +147,7 @@
                 ":3000/cmcd/response-mode" /*mandatory, URL to send report */,
               requestMethod: "POST" /*optional, get by default */,
             },
-            stateIntervalMode: {
+            eventMode: {
               enabled: true /* enable cmcdv2 state-interval mode. FALSE by default */,
               mode: CMCD_MODE_QUERY /*overrides global mode. JSON not supported */,
               interval: 10000 /* time in ms between regular requests. Default 30s or 0 to omit */,
@@ -164,7 +164,7 @@
               requestUrl:
                 "http://" +
                 window.location.hostname +
-                ":3000/cmcd/state-interval-mode" /* mandatory, URL to send report */,
+                ":3000/cmcd/event-mode" /* mandatory, URL to send report */,
               requestMethod: "POST" /* optional, get by default */,
             },
           },
