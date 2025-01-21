@@ -28,7 +28,6 @@ class VideoClicksPlugin {
       if (assetList && assetList.ASSETS.length > 0) {
         this.assetList = assetList;
 
-        // Attach event listeners to handle interstitials
         this.hls.on(Hls.Events.INTERSTITIAL_STARTED, () => {
           hls.logger.log("Interstitial started. Loading ad assets...");
           this.loadAdAssets();
@@ -78,10 +77,10 @@ class VideoClicksPlugin {
       return;
     }
 
-    const clickthroughUrl = videoClicks.clickThrough.url;
+    const clickThroughUrl = videoClicks.clickThrough.url;
     hls.logger.log("Displaying clickable ad:", ad);
 
-    const adVignette = this.createAdOverlay(this.container, clickthroughUrl);
+    const adVignette = this.createAdOverlay(this.container, clickThroughUrl);
     this.container.appendChild(adVignette);
 
     setTimeout(() => {
@@ -93,7 +92,7 @@ class VideoClicksPlugin {
     }, DURATION * 1000);
   }
 
-  createAdOverlay(videoContainer, clickthroughUrl) {
+  createAdOverlay(videoContainer, clickThroughUrl) {
     const adVignette = document.createElement("div");
 
     const videoRect = videoContainer.querySelector('video').getBoundingClientRect(); 
@@ -117,9 +116,9 @@ class VideoClicksPlugin {
     adVignette.style.pointerEvents = "auto";
 
     adVignette.onclick = () => {
-      hls.logger.log("Ad vignette clicked. Redirecting to:", clickthroughUrl);
-      this.sendAdClickEvent(clickthroughUrl);
-      window.open(clickthroughUrl, "_blank");
+      hls.logger.log("Ad vignette clicked. Redirecting to:", clickThroughUrl);
+      this.sendAdClickEvent(clickThroughUrl);
+      window.open(clickThroughUrl, "_blank");
     };
 
     const adText = document.createElement("span");
@@ -173,11 +172,11 @@ class VideoClicksPlugin {
     }
   }
 
-  sendAdClickEvent(clickthroughUrl) {
+  sendAdClickEvent(clickThroughUrl) {
 
     const payload = {
       event: "ad_click",
-      ad_url: clickthroughUrl,
+      ad_url: clickThroughUrl,
       timestamp: new Date().toISOString(),
     };
   
