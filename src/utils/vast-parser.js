@@ -25,6 +25,7 @@ async function getVideoManifests(vastUrl, manifestType) {
   if (parsedVast.ads) {
     for (let i = 0; i < parsedVast.ads.length; i++) {
       const ad = parsedVast.ads[i];
+      const { impressionURLTemplates } = ad;
       if (ad.creatives) {
         for (let j = 0; j < ad.creatives.length; j++) {
           const creative = ad.creatives[j];
@@ -41,6 +42,7 @@ async function getVideoManifests(vastUrl, manifestType) {
                   fileURL: mediaFile.fileURL,
                   duration,
                   trackingEvents: creative.trackingEvents,
+                  impressions: impressionURLTemplates,
                 });
               }
             }
