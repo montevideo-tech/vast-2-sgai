@@ -28,6 +28,7 @@ class VideoClicksPlugin {
       if (assetList && assetList.ASSETS.length > 0) {
         this.assetList = assetList;
 
+        // Attach event listeners to handle interstitials
         this.hls.on(Hls.Events.INTERSTITIAL_STARTED, () => {
           hls.logger.log("Interstitial started. Loading ad assets...");
           this.loadAdAssets();
@@ -77,10 +78,9 @@ class VideoClicksPlugin {
       return;
     }
 
-    const clickThroughUrl = videoClicks.clickThrough.url;
     hls.logger.log("Displaying clickable ad:", ad);
 
-    const adVignette = this.createAdOverlay(this.container, clickThroughUrl);
+    const adVignette = this.createAdOverlay(this.container, videoClicks);
     this.container.appendChild(adVignette);
 
     setTimeout(() => {
@@ -92,9 +92,13 @@ class VideoClicksPlugin {
     }, DURATION * 1000);
   }
 
-  createAdOverlay(videoContainer, clickThroughUrl) {
-    const adVignette = document.createElement("div");
+  createAdOverlay(videoContainer, videoClicks) {
+    
+    
+    const clickThroughUrl = videoClicks.clickThrough.url;
+    const clickTracking = videoClicks.clickTracking;
 
+    const adVignette = document.createElement("div");
     const videoRect = videoContainer.querySelector('video').getBoundingClientRect(); 
     const adVignetteWidth = adVignette.offsetWidth; 
     const adVignetteHeight = adVignette.offsetHeight;
@@ -117,7 +121,7 @@ class VideoClicksPlugin {
 
     adVignette.onclick = () => {
       hls.logger.log("Ad vignette clicked. Redirecting to:", clickThroughUrl);
-      this.sendAdClickEvent(clickThroughUrl);
+      this.sendAdClickEvent(clickTracking);
       window.open(clickThroughUrl, "_blank");
     };
 
@@ -172,30 +176,22 @@ class VideoClicksPlugin {
     }
   }
 
-  sendAdClickEvent(clickThroughUrl) {
-
-    const payload = {
-      event: "ad_click",
-      ad_url: clickThroughUrl,
-      timestamp: new Date().toISOString(),
-    };
+  sendAdClickEvent(clickTracking) {
   
-    fetch(this.clickEventUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
-      .then((response) => {
-        if (response.ok) {
-          hls.logger.log("Ad click event sent successfully.");
-        } else {
-          hls.logger.error("Failed to send ad click event.");
-        }
+  clickTracking.forEach((tracking) => {
+    fetch(tracking.url, {
+      method: "GET",
       })
-      .catch((error) => {
-        hls.logger.error("Error sending ad click event:", error);
-      });
-  }
+        .then((response) => {
+          if (response.ok) {
+            hls.logger.log("Ad click event sent successfully.");
+          } else {
+            hls.logger.error("Failed to send ad click event.");
+          }
+        })
+        .catch((error) => {
+          hls.logger.error("Error sending ad click event:", error);
+        })
+    });
+  };
 }

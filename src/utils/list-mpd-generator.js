@@ -17,7 +17,7 @@ function getListMPD(ads){
   // Generate Period and ImportedMPD elements
   ads.forEach((ad, index) => {
     const earliestResolutionTimeOffset = index === 0 ? 0 : DASH_RESOLUTION_TIME_OFFSET;
-    mpdXml += `  <Period id="${index + 1}">
+    mpdXml += `  <Period id="${index + 1}" duration="PT${ad.duration}S">
       <ImportedMPD uri="${ad.fileURL}" earliestResolutionTimeOffset="${earliestResolutionTimeOffset}"/>
     </Period>\n`;
   });

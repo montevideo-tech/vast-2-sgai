@@ -36,7 +36,9 @@
        <Tracking event="progress" offset="60.5%"><![CDATA[http://localhost:8000/?event=progress&start=6.5]]></Tracking>
       </TrackingEvents>
       <VideoClicks>
-       <ClickThrough id="GDFP"><![CDATA[https://pubads.g.doubleclick.net/pcs/click?xai=AKAOjstxAPF4SZnn9lWQUI2tmCNyzbKk-0JnxSiAXSpuS8JiOQ8Jq7G2Ddo-sd6NprqcRGw4TyhC4e-JtiqZq5ZyIuqCfyhPiGXDaN7YOBWcaqIMlLPRGaJthOOa1bc4suuBlCuqovdhNlUgAgjn0fxehHODfc12ZQYmKhomhS0PFqwV1F0eQEUNQXqlnuQadbpdrXnsOzD3T32hudbqJRBPHoPaxbhB37HppdA29rrw0jwcFg9iR3l3tAymjUQq618KtR7FC6gEM-Sk3-NBEjeLO8MCk2XhVuTcDEkgNz1DaMQ2ah0EpuP70VfxyIn9nkXuScpQt-eEcVoa59qjnCIkyo1T2g3Pp4P4uC1J380KV5g83hOU&sai=AMfl-YSBya7Y7IUK4BcI3zUIECXHKDBOJs5xNQrJwHJHp4vMAkLWBnPUbCMOAdckTJtgsS_tPeoQFf18ngGt&sig=Cg0ArKJSzHVI0ajoHYe0&fbs_aeid=%5Bgw_fbsaeid%5D&adurl=https://googleads.github.io/googleads-ima-html5/vsi/]]></ClickThrough>
+       <ClickThrough id="GDFP"><![CDATA[http://pubads.g.doubleclick.net/pcs/click?xai=AKAOjstxAPF4SZnn9lWQUI2tmCNyzbKk-0JnxSiAXSpuS8JiOQ8Jq7G2Ddo-sd6NprqcRGw4TyhC4e-JtiqZq5ZyIuqCfyhPiGXDaN7YOBWcaqIMlLPRGaJthOOa1bc4suuBlCuqovdhNlUgAgjn0fxehHODfc12ZQYmKhomhS0PFqwV1F0eQEUNQXqlnuQadbpdrXnsOzD3T32hudbqJRBPHoPaxbhB37HppdA29rrw0jwcFg9iR3l3tAymjUQq618KtR7FC6gEM-Sk3-NBEjeLO8MCk2XhVuTcDEkgNz1DaMQ2ah0EpuP70VfxyIn9nkXuScpQt-eEcVoa59qjnCIkyo1T2g3Pp4P4uC1J380KV5g83hOU&sai=AMfl-YSBya7Y7IUK4BcI3zUIECXHKDBOJs5xNQrJwHJHp4vMAkLWBnPUbCMOAdckTJtgsS_tPeoQFf18ngGt&sig=Cg0ArKJSzHVI0ajoHYe0&fbs_aeid=%5Bgw_fbsaeid%5D&adurl=https://googleads.github.io/googleads-ima-html5/vsi/]]></ClickThrough>
+       <ClickTracking id="1"><![CDATA[https://localhost:8000/clicktracking1]]></ClickTracking>
+       <ClickTracking id="2"><![CDATA[https://localhost:8000/clicktracking2]]></ClickTracking>
       </VideoClicks>
       <Icons>
        <Icon program="GoogleWhyThisAd" width="18" height="18" xPosition="right" yPosition="bottom" altText="Google Why This Ad">
@@ -122,6 +124,7 @@
       </TrackingEvents>
       <VideoClicks>
        <ClickThrough id="GDFP"><![CDATA[http://localhost:8000/]]></ClickThrough>
+       <ClickTracking id="3"><![CDATA[https://localhost:8000/clicktracking3]]></ClickTracking>
       </VideoClicks>
       <Icons>
        <Icon program="GoogleWhyThisAd" width="18" height="18" xPosition="right" yPosition="bottom" altText="Google Why This Ad">

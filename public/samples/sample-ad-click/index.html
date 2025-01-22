@@ -19,14 +19,97 @@
       font-size: 16px;
       border-radius: 5px;
     }
+    video {
+      height: 300px;
+      width: 533px;
+      background-color: black;
+    }
+
+    .video-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    header {
+      padding: 1rem;
+      background-color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: center;
+    }
+
+    .project-name {
+      color: #63ba93;
+      text-align: center;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, -apple-system, system-ui, Segoe UI, Helvetica,
+        Arial, sans-serif;
+    }
+
+    #logo {
+      margin-right: auto;
+    }
+
+    .samples {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .samples a {
+      color: black;
+      font-weight: 500;
+    }
+
+    .samples a:hover {
+      color: #36b4a7;
+      transition: ease-in-out 250ms;
+    }
+
+    .samples h1 {
+      color: #36b4a7;
+    }
+
+    .samples p {
+      overflow: auto;
+    }
+
+    ul li:not(:last-child) {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 
 <body>
-  <h1>Sample VAST with Ad Click Tracking</h1>
-  <p>HLS, interstitial@5sec, 1 ad parsed form <a href="vast-sample.xml">this Google IMA VAST example</a></p>
-
-  <div id="player-container">
+  <body>
+    <header>
+      <div class="header-container">
+        <a href="/">
+          <img
+            src="/logo.svg"
+            alt="Company Logo"
+            width="150"
+            height="50"
+            id="logo"
+          />
+        </a>
+        <h1 class="project-name">VAST-2-SGAI</h1>
+      </div>
+    </header>
+    <div class="samples">
+      <h1>Sample VAST with Click Tracking</h1>
+      <p>
+        HLS, interstitial@5sec, 1 ad parsed form
+        <a href="vast-sample.xml">this Google IMA VAST example</a>
+      </p>
+  <div id="player-container" class="video-container">
     <video id="video" controls></video>
   </div>
   <script>
@@ -99,10 +182,9 @@
       hls.attachMedia(video);
 
       const videoClicksPlugin = new VideoClicksPlugin(hls, {
-            apiUrl: "http://localhost:3000/api/asset-list?vasturl=http%3A%2F%2Flocalhost%3A3000%2Fsamples%2Fsample-ad-signaling%2Fvast-sample.xml%3F&user=1234&content=abc&_HLS_primary_id=d9ac2bba-44f0-47e5-b948-ccbe26b92d8a",
-            container: document.getElementById("player-container"),
-            clickEventUrl: "http://localhost:8000/?event=ad-click"
-        });
+        apiUrl: "http://localhost:3000/api/asset-list?vasturl=http%3A%2F%2Flocalhost%3A3000%2Fsamples%2Fsample-ad-click%2Fvast-sample.xml%3F&user=1234&content=abc&_HLS_primary_id=d9ac2bba-44f0-47e5-b948-ccbe26b92d8a",
+        container: document.getElementById("player-container")
+      });
 
     }
   </script>

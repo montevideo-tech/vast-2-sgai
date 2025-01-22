@@ -36,8 +36,8 @@ async function getAds(req, manifestType) {
   return await getVideoManifests(finalUrl, manifestType);
 }
 
-function mapAdCreativeSignaling(ad, trackingEvents) {
-  const mapper = new AdCreativeSignalingMapper(ad, trackingEvents);
+function mapAdCreativeSignaling(ad) {
+  const mapper = new AdCreativeSignalingMapper(ad);
   const mappedTrackingEvents = mapper.map();
 
   return mappedTrackingEvents;
@@ -59,7 +59,6 @@ router.get(
     }
     const assetList = { ASSETS: [] };
     ads.forEach((ad) => {
-      const trackingEvents = mapAdCreativeSignaling(ad, ad.trackingEvents);
       
       const videoClicksSignaling = {
         clickThrough: ad.videoClicks?.clickThrough,
@@ -67,6 +66,7 @@ router.get(
         customClick: ad.videoClicks?.customClick,
       };
 
+      const trackingEvents = mapAdCreativeSignaling(ad);
       assetList.ASSETS.push({
         URI: ad.fileURL,
         DURATION: ad.duration,
@@ -78,12 +78,6 @@ router.get(
               type: "linear",
               start: 0.0,
               duration: ad.duration,
-              identifiers: [
-                {
-                  scheme: "urn:com:example:ads:id",
-                  value: "972c79e1-2363-403e-9287-a0fa4323c389",
-                },
-              ],
               tracking: trackingEvents,
             },
           ],

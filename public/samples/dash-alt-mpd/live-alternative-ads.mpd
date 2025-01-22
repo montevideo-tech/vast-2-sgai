@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MPD xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:cmcd="http://www.qualabs.com/cmcd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 DASH-MPD.xsd" profiles="urn:mpeg:dash:profile:isoff-live:2011,http://dashif.org/guidelines/dash-if-simple" type="dynamic" availabilityStartTime="1970-01-01T00:00:00Z" publishTime="1970-01-01T00:00:00Z" minimumUpdatePeriod="PT2S" minBufferTime="PT2S" timeShiftBufferDepth="PT1M" maxSegmentDuration="PT2S">
+  <BaseURL>https://livesim.dashif.org/livesim2/scte35_2/testpic_2s/</BaseURL>
+  <Period id="P0" start="PT0S">
+    <EventStream xmlns="" schemeIdUri="urn:mpeg:dash:event:alternativeMPD:2022" timescale="1000">
+      <Event id="ad1" presentationTime="10000" duration="10000">
+        <AlternativeMPD uri="/api/list-mpd?vasturl=http://localhost:3000/samples/dash-alt-mpd/vast-sample.xml" earliestResolutionTimeOffset="5000" mode="replace" returnOffset="0" cmcd:RequestModeEnabled="false"/>
+      </Event>
+      <Event id="ad2" presentationTime="40000" duration="5000">
+        <AlternativeMPD uri="https://comcast-dash-6-assets.s3.us-east-2.amazonaws.com/TestAssets/MediaOfflineErrorAsset/stream.mpd" earliestResolutionTimeOffset="5000" mode="replace" returnOffset="0"/>
+      </Event>
+      <Event id="ad3" presentationTime="70000" duration="5000">
+        <AlternativeMPD uri="https://media.axprod.net/TestVectors/v7-Clear/Manifest_1080p.mpd" earliestResolutionTimeOffset="5000" mode="replace" returnOffset="0"/>
+      </Event>
+    </EventStream>
+    <AdaptationSet lang="en" contentType="audio" segmentAlignment="true" mimeType="audio/mp4" startWithSAP="1">
+      <Role schemeIdUri="urn:mpeg:dash:role:2011" value="main"/>
+      <SegmentTemplate media="$RepresentationID$/$Number$.m4s" initialization="$RepresentationID$/init.mp4" duration="2" startNumber="0"/>
+      <Representation id="A48" bandwidth="48000" audioSamplingRate="48000" codecs="mp4a.40.2">
+        <AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/>
+      </Representation>
+    </AdaptationSet>
+    <AdaptationSet contentType="video" par="16:9" minWidth="640" maxWidth="640" minHeight="360" maxHeight="360" maxFrameRate="60/2" segmentAlignment="true" mimeType="video/mp4" startWithSAP="1">
+      <InbandEventStream schemeIdUri="urn:scte:scte35:2013:bin"/>
+      <Role schemeIdUri="urn:mpeg:dash:role:2011" value="main"/>
+      <SegmentTemplate media="$RepresentationID$/$Number$.m4s" initialization="$RepresentationID$/init.mp4" duration="2" startNumber="0"/>
+      <Representation id="V300" bandwidth="300000" width="640" height="360" sar="1:1" frameRate="60/2" codecs="avc1.64001e"/>
+    </AdaptationSet>
+  </Period>
+  <UTCTiming schemeIdUri="urn:mpeg:dash:utc:http-xsdate:2014" value="https://time.akamai.com/?iso&amp;ms"/>
+</MPD>
