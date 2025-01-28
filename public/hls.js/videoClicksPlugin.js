@@ -1,7 +1,5 @@
 class VideoClicksPlugin {
   constructor(hls, options) {
-    console.log("Initializing VideoClicksPlugin");
-
     if (!hls || typeof hls.on !== "function") {
       throw new Error("Invalid HLS.js instance passed to the plugin.");
     }
@@ -12,6 +10,8 @@ class VideoClicksPlugin {
     this.clickEventUrl = options.clickEventUrl || null;
     this.assetList = { ASSETS: [] };
     this.currentAdIndex = 0;
+    this.isAdPlaying = false;
+    this.adVignette = null;
 
     this.container.style.position = "relative";
 
@@ -20,35 +20,32 @@ class VideoClicksPlugin {
 
   init() {
     this.hls.on(Hls.Events.INTERSTITIAL_ASSET_STARTED, (_, data) => {
-      console.log("Received INTERSTITIAL_ASSET_STARTED event:", data);
-
       const { assetListIndex } = data;
       const assetListResponse = data.event?.assetListResponse;
       if (!assetListResponse || !assetListResponse.ASSETS?.length) {
-        console.warn("No valid assets found in the response.");
         return;
       }
 
       this.assetList = assetListResponse;
       this.currentAdIndex = assetListIndex;
-      this.hls.logger.log("Updated asset list:", this.assetList);
 
       this.loadAdAssets();
     });
 
-    this.hls.on(Hls.Events.INTERSTITIAL_STARTED, () => {
-      this.hls.logger.log("Interstitial started.");
+    this.hls.on(Hls.Events.INTERSTITIAL_ASSET_ENDED, () => {
+      if (this.adVignette && this.container.contains(this.adVignette)) {
+        this.container.removeChild(this.adVignette);
+      }
+      this.isAdPlaying = false;
     });
 
     this.hls.on(Hls.Events.INTERSTITIAL_ENDED, () => {
-      this.hls.logger.log("Interstitial ended. Cleaning up.");
       this.cleanupAd();
     });
   }
 
   loadAdAssets() {
     if (this.assetList.ASSETS.length === 0) {
-      this.hls.logger.warn("No ad assets to display.");
       return;
     }
 
@@ -56,23 +53,22 @@ class VideoClicksPlugin {
   }
 
   showAd(ad) {
+    if (this.isAdPlaying) return;
+
     const { DURATION, "X-VAST2SGAI-VIDEOCLICKS": videoClicks } = ad;
 
     if (!videoClicks || !videoClicks.clickThrough?.url) {
-      this.hls.logger.warn("Invalid ad configuration. Skipping this ad.");
       this.loadNextAd();
       return;
     }
 
-    this.hls.logger.log("Displaying clickable ad:", ad);
-
-    const adVignette = this.createAdOverlay(this.container, videoClicks);
-    this.container.appendChild(adVignette);
+    this.isAdPlaying = true;
+    this.adVignette = this.createAdOverlay(this.container, videoClicks);
+    this.container.appendChild(this.adVignette);
 
     setTimeout(() => {
-      this.hls.logger.log("Ad duration ended. Removing vignette.");
-      if (this.container.contains(adVignette)) {
-        this.container.removeChild(adVignette);
+      if (this.container.contains(this.adVignette)) {
+        this.container.removeChild(this.adVignette);
       }
       this.loadNextAd();
     }, DURATION * 1000);
@@ -81,10 +77,8 @@ class VideoClicksPlugin {
   createAdOverlay(videoContainer, videoClicks) {
     const clickThroughUrl = videoClicks.clickThrough.url;
     const clickTracking = videoClicks.clickTracking || [];
-
     const videoElement = videoContainer.querySelector("video");
     if (!videoElement) {
-      console.error("Video element not found. Cannot position ad overlay.");
       return;
     }
 
@@ -114,11 +108,9 @@ class VideoClicksPlugin {
     };
 
     updateVignettePosition();
-
     window.addEventListener("resize", updateVignettePosition);
 
     adVignette.onclick = () => {
-      this.hls.logger.log("Ad vignette clicked. Redirecting to:", clickThroughUrl);
       this.sendAdClickEvent(clickTracking);
       window.open(clickThroughUrl, "_blank");
     };
@@ -139,7 +131,7 @@ class VideoClicksPlugin {
       event.stopPropagation();
       adVignette.style.opacity = "0";
       setTimeout(() => adVignette.remove(), 300);
-      window.removeEventListener("resize", updateVignettePosition); // Clean up listener
+      window.removeEventListener("resize", updateVignettePosition);
     };
 
     adVignette.appendChild(adText);
@@ -149,14 +141,10 @@ class VideoClicksPlugin {
     return adVignette;
   }
 
-
-
   cleanupAd() {
     const overlays = this.container.querySelectorAll("div");
-
     overlays.forEach((overlay) => {
       if (overlay.onclick) {
-        this.hls.logger.log("Removing ad vignette.");
         this.container.removeChild(overlay);
       }
     });
@@ -167,23 +155,13 @@ class VideoClicksPlugin {
     if (this.currentAdIndex < this.assetList.ASSETS.length) {
       this.showAd(this.assetList.ASSETS[this.currentAdIndex]);
     } else {
-      this.hls.logger.log("All ads finished.");
+      this.isAdPlaying = false;
     }
   }
 
   sendAdClickEvent(clickTracking) {
     clickTracking.forEach((tracking) => {
-      fetch(tracking.url, { method: "GET" })
-        .then((response) => {
-          if (response.ok) {
-            this.hls.logger.log("Ad click event sent successfully.");
-          } else {
-            this.hls.logger.error("Failed to send ad click event.");
-          }
-        })
-        .catch((error) => {
-          this.hls.logger.error("Error sending ad click event:", error);
-        });
+      fetch(tracking.url, { method: "GET" }).catch(() => {});
     });
   }
 }
