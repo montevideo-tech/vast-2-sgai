@@ -1,6 +1,5 @@
 class VideoClicksPlugin {
   constructor(hls, options) {
-    console.log("Initializing VideoClicksPlugin");
     if (!hls || typeof hls.on !== "function") {
       throw new Error("Invalid HLS.js instance passed to the plugin.");
     }
@@ -8,10 +7,11 @@ class VideoClicksPlugin {
     this.hls = hls;
     this.options = options || {};
     this.container = options.container || document.body;
-    this.apiUrl = options.apiUrl || null;
-    this.clickEventUrl = options.clickEventUrl  || null
+    this.clickEventUrl = options.clickEventUrl || null;
     this.assetList = { ASSETS: [] };
     this.currentAdIndex = 0;
+    this.isAdPlaying = false;
+    this.adVignette = null;
 
     this.container.style.position = "relative";
 
@@ -19,50 +19,33 @@ class VideoClicksPlugin {
   }
 
   init() {
-    if (!this.apiUrl) {
-      hls.logger.error("API URL for fetching ads is not provided.");
-      return;
-    }
-
-    this.fetchAdAssets().then((assetList) => {
-      if (assetList && assetList.ASSETS.length > 0) {
-        this.assetList = assetList;
-
-        // Attach event listeners to handle interstitials
-        this.hls.on(Hls.Events.INTERSTITIAL_STARTED, () => {
-          hls.logger.log("Interstitial started. Loading ad assets...");
-          this.loadAdAssets();
-        });
-
-        this.hls.on(Hls.Events.INTERSTITIAL_ENDED, () => {
-          hls.logger.log("Interstitial ended. Cleaning up ad assets...");
-          this.cleanupAd();
-        });
-      } else {
-        hls.logger.warn("No ad assets available from API.");
+    this.hls.on(Hls.Events.INTERSTITIAL_ASSET_STARTED, (_, data) => {
+      const { assetListIndex } = data;
+      const assetListResponse = data.event?.assetListResponse;
+      if (!assetListResponse || !assetListResponse.ASSETS?.length) {
+        return;
       }
-    }).catch((error) => {
-      hls.logger.error("Error fetching ad assets:", error);
+
+      this.assetList = assetListResponse;
+      this.currentAdIndex = assetListIndex;
+
+      this.loadAdAssets();
     });
-  }
 
-  async fetchAdAssets() {
-    try {
-      const response = await fetch(this.apiUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch ad assets: ${response.statusText}`);
+    this.hls.on(Hls.Events.INTERSTITIAL_ASSET_ENDED, () => {
+      if (this.adVignette && this.container.contains(this.adVignette)) {
+        this.container.removeChild(this.adVignette);
       }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      hls.logger.error("Error during API call:", error);
-      return null;
-    }
+      this.isAdPlaying = false;
+    });
+
+    this.hls.on(Hls.Events.INTERSTITIAL_ENDED, () => {
+      this.cleanupAd();
+    });
   }
 
   loadAdAssets() {
     if (this.assetList.ASSETS.length === 0) {
-      hls.logger.warn("No ad assets to display.");
       return;
     }
 
@@ -70,44 +53,39 @@ class VideoClicksPlugin {
   }
 
   showAd(ad) {
-    const { URI, DURATION, "X-VAST2SGAI-VIDEOCLICKS": videoClicks } = ad;
+    if (this.isAdPlaying) return;
 
-    if (!videoClicks || !videoClicks.clickThrough || !videoClicks.clickThrough.url) {
-      hls.logger.warn("Invalid ad configuration. Skipping this ad.");
+    const { DURATION, "X-VAST2SGAI-VIDEOCLICKS": videoClicks } = ad;
+
+    if (!videoClicks || !videoClicks.clickThrough?.url) {
       this.loadNextAd();
       return;
     }
 
-    hls.logger.log("Displaying clickable ad:", ad);
-
-    const adVignette = this.createAdOverlay(this.container, videoClicks);
-    this.container.appendChild(adVignette);
+    this.isAdPlaying = true;
+    this.adVignette = this.createAdOverlay(this.container, videoClicks);
+    this.container.appendChild(this.adVignette);
 
     setTimeout(() => {
-      hls.logger.log("Ad duration ended. Removing vignette.");
-      if (this.container.contains(adVignette)) {
-        this.container.removeChild(adVignette);
+      if (this.container.contains(this.adVignette)) {
+        this.container.removeChild(this.adVignette);
       }
       this.loadNextAd();
     }, DURATION * 1000);
   }
 
   createAdOverlay(videoContainer, videoClicks) {
-    
-    
     const clickThroughUrl = videoClicks.clickThrough.url;
-    const clickTracking = videoClicks.clickTracking;
+    const clickTracking = videoClicks.clickTracking || [];
+    const videoElement = videoContainer.querySelector("video");
+    if (!videoElement) {
+      return;
+    }
+
+    videoContainer.style.position = "relative";
 
     const adVignette = document.createElement("div");
-    const videoRect = videoContainer.querySelector('video').getBoundingClientRect(); 
-    const adVignetteWidth = adVignette.offsetWidth; 
-    const adVignetteHeight = adVignette.offsetHeight;
-    const leftOffset = videoRect.left + videoRect.width - adVignetteWidth - 200; 
-    const topOffset = videoRect.top + 10; 
-  
-    adVignette.style.position = "fixed"; 
-    adVignette.style.top = `${topOffset}px`;
-    adVignette.style.left = `${leftOffset}px`;
+    adVignette.style.position = "absolute"; 
     adVignette.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
     adVignette.style.color = "#fff";
     adVignette.style.borderRadius = "12px";
@@ -115,18 +93,30 @@ class VideoClicksPlugin {
     adVignette.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.4)";
     adVignette.style.fontFamily = "Arial, sans-serif";
     adVignette.style.fontSize = "12px";
-    adVignette.style.zIndex = "10000";
+    adVignette.style.zIndex = "10"; 
     adVignette.style.cursor = "pointer";
     adVignette.style.pointerEvents = "auto";
+    adVignette.style.display = "inline-flex";
+    adVignette.style.alignItems = "center";
+    adVignette.style.minWidth = "150px";
+    adVignette.style.justifyContent = "space-between";
+
+    const updateVignettePosition = () => {
+      const videoRect = videoElement.getBoundingClientRect();
+      adVignette.style.top = "10px"; 
+      adVignette.style.left = `${videoRect.width - 200}px`; 
+    };
+
+    updateVignettePosition();
+    window.addEventListener("resize", updateVignettePosition);
 
     adVignette.onclick = () => {
-      hls.logger.log("Ad vignette clicked. Redirecting to:", clickThroughUrl);
       this.sendAdClickEvent(clickTracking);
       window.open(clickThroughUrl, "_blank");
     };
 
     const adText = document.createElement("span");
-    adText.textContent = "Learn more about this Ad!";
+    adText.textContent = new URL(clickThroughUrl).hostname + "...";
     adText.style.marginRight = "8px";
 
     const closeButton = document.createElement("button");
@@ -141,27 +131,20 @@ class VideoClicksPlugin {
       event.stopPropagation();
       adVignette.style.opacity = "0";
       setTimeout(() => adVignette.remove(), 300);
+      window.removeEventListener("resize", updateVignettePosition);
     };
 
     adVignette.appendChild(adText);
     adVignette.appendChild(closeButton);
-
-    if (videoContainer) {
-      videoContainer.style.position = "relative";
-      videoContainer.appendChild(adVignette);
-    } else {
-      console.error("Video container not found!");
-    }
+    videoContainer.appendChild(adVignette);
 
     return adVignette;
   }
 
   cleanupAd() {
     const overlays = this.container.querySelectorAll("div");
-
     overlays.forEach((overlay) => {
       if (overlay.onclick) {
-        hls.logger.log("Removing ad vignette.");
         this.container.removeChild(overlay);
       }
     });
@@ -172,26 +155,13 @@ class VideoClicksPlugin {
     if (this.currentAdIndex < this.assetList.ASSETS.length) {
       this.showAd(this.assetList.ASSETS[this.currentAdIndex]);
     } else {
-      hls.logger.log("All ads finished.");
+      this.isAdPlaying = false;
     }
   }
 
   sendAdClickEvent(clickTracking) {
-  
-  clickTracking.forEach((tracking) => {
-    fetch(tracking.url, {
-      method: "GET",
-      })
-        .then((response) => {
-          if (response.ok) {
-            hls.logger.log("Ad click event sent successfully.");
-          } else {
-            hls.logger.error("Failed to send ad click event.");
-          }
-        })
-        .catch((error) => {
-          hls.logger.error("Error sending ad click event:", error);
-        })
+    clickTracking.forEach((tracking) => {
+      fetch(tracking.url, { method: "GET" }).catch(() => {});
     });
-  };
+  }
 }
