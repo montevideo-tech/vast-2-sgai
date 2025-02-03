@@ -1,0 +1,221 @@
+<head>
+  <title>Sample API VASTID (LIVE)</title>
+  <script src="../../hls.js/hls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>  
+  <style>
+    video {
+      height: 300px;
+      width: 533px;
+      background-color: black;
+    }
+
+    .video-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    header {
+      padding: 1rem;
+      background-color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: center;
+    }
+
+    .project-name {
+      color: #63ba93;
+      text-align: center;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, -apple-system, system-ui, Segoe UI, Helvetica,
+        Arial, sans-serif;
+    }
+
+    #logo {
+      margin-right: auto;
+    }
+
+    .samples {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .samples a {
+      color: black;
+      font-weight: 500;
+    }
+
+    .samples a:hover {
+      color: #36b4a7;
+      transition: ease-in-out 250ms;
+    }
+
+    .samples h1 {
+      color: #36b4a7;
+    }
+
+    ul li:not(:last-child) {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-container">
+      <a href="/">
+        <img
+          src="/logo.svg"
+          alt="Company Logo"
+          width="150"
+          height="50"
+          id="logo"
+        />
+      </a>
+      <h1 class="project-name">VAST-2-SGAI</h1>
+    </div>
+  </header>
+  <div class="samples">
+    <h1>Sample API VASTID (LIVE w/BBB)</h1>
+    <p>
+      HLS, live, 1 ad parsed form
+      <a href="vast-sample.xml">this Google IMA VAST example</a>
+    </p>
+    <p>
+      <b>Source: </b>BBB restreamed as live
+    </p>
+    <p style="display:inline">
+      <b>Insert: </b><pre style="display:inline">curl https://demo.entrypoint.cloud.wowza.com/v1/ads/applications/bbb/streams/mystream</pre>
+    </p>
+    <div class="video-container">
+      <video id="video" controls></video>
+    </div>
+  </div>
+  <button onclick="sendGetRequest2()">Send GET Request</button>
+  <script>
+
+const sendGetRequest2 = async () => {
+    const result = await fetch(
+        "http://localhost:1935/v1/ads/applications/simu-live/streams/myStream",
+        {
+            method: "get"
+        }
+    );
+    console.log(result); //this will only be done after the await section, since the function is defined as async
+};
+
+function sendGetRequest() {
+      fetch('http://localhost:1935/v1/ads/applications/simu-live/streams/myStream', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data);
+        alert('Request sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        alert('Failed to send request');
+      });
+    }
+
+    function send_now()
+    {
+      //fetch("http://localhost:1935/v1/adds", {method: "GET"});
+      var request = $.ajax({
+        url: 'http://localhost:1935/v1/adds',
+        timeout:30000,
+        type: "GET"
+      });
+
+      // var xmlHttp = new XMLHttpRequest();
+      // xmlHttp.open( "GET", "http://localhost:1935/v1/adds", true ); // false for synchronous request
+      // xmlHttp.send( null );
+      // console.log(xmlHttp.responseText);
+      // return true;
+    }
+
+
+    if (Hls.isSupported()) {
+      var video = document.getElementById("video");
+      var hls = new Hls({
+        enableInterstitialPlayback: true,
+        interstitialAppendInPlace: true,
+        interstitialLiveLookAhead: 20,
+      });
+
+      hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+        console.log("video and hls.js are now bound together !");
+      });
+
+      hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+        console.log(
+          "manifest loaded, found " + data.levels.length + " quality level"
+        );
+      });
+
+      hls.on(Hls.Events.INTERSTITIALS_UPDATED, (event, data) => {
+        console.log("INTERSTITIALS_UPDATED", data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIALS_BUFFERED_TO_BOUNDARY, (event, data) => {
+        console.log("INTERSTITIALS_BUFFERED_TO_BOUNDARY", data);
+        console.log("hls interstitialsManager", hls.interstitialsManager);
+      });
+
+      hls.on(Hls.Events.ASSET_LIST_LOADING, (event, data) => {
+        console.log("ASSET_LIST_LOADING", data);
+      });
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        console.log("ERROR", data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIAL_ASSET_PLAYER_CREATED, (event, data) => {
+        console.log("INTERSTITIAL_ASSET_PLAYER_CREATED", data);
+      });
+
+      hls.on(Hls.Events.ASSET_LIST_LOADED, (event, data) => {
+        console.log("ASSET_LIST_LOADED", data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIAL_STARTED, (event, data) => {
+        console.log("INTERSTITIAL_STARTED", data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIAL_ENDED, (event, data) => {
+        console.log("INTERSTITIAL_ENDED", data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIAL_ASSET_STARTED, (event, data) => {
+        console.log("INTERSTITIAL_ASSET_STARTED", data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIAL_ASSET_ENDED, (event, data) => {
+        console.log("INTERSTITIAL_ASSET_ENDED", data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIALS_PRIMARY_RESUMED, (event, data) => {
+        console.log("INTERSTITIALS_PRIMARY_RESUMED", data);
+      });
+
+      hls.on(Hls.Events.INTERSTITIAL_ASSET_ERROR, (event, data) => {
+        console.log("INTERSTITIAL_ASSET_ERROR", data);
+      });
+
+      hls.loadSource("http://demo.entrypoint.cloud.wowza.com/bbb/mystream/chunklist_w225987628.m3u8?user=1234&content=abc");
+
+      hls.attachMedia(video);
+    }
+  </script>
+</body>
