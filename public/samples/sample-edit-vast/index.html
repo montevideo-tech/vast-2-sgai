@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample VAST 1</title>
+  <script src="../../hls.js/hls.js"></script>
+  <script src="../../hls.js/adCreativeSignalingPlugin.js"></script>
+  <script src="../../hls.js/videoClicksPlugin.js"></script>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    video {
+      height: 300px;
+      width: 533px;
+      background-color: black;
+    }
+
+    .video-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    header {
+      padding: 1rem;
+      background-color: #ffffff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: center;
+    }
+
+    .project-name {
+      color: #36b4a7;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .samples {
+      max-width: 90%;
+      margin: 2rem auto;
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .samples h1 {
+      color: #36b4a7;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .inputs-container {
+      display: flex;
+      flex-direction: column;
+      margin-top: 20px;
+    }
+
+    .inputs-container input {
+      margin-bottom: 8px;
+      padding: 6px;
+      font-size: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      width: 100%; /* Ensures inputs take full width of the container */
+      box-sizing: border-box; /* Prevents inputs from exceeding container size */
+      overflow: hidden; /* Prevents scrolling inside inputs */
+    }
+
+    .inputs-container input:focus {
+      border-color: #36b4a7;
+      box-shadow: 0 0 3px rgba(54, 180, 167, 0.6);
+      outline: none;
+    }
+
+    .inputs-container button {
+      padding: 10px;
+      font-size: 14px;
+      background-color: #36b4a7;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px;
+      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      width: 100%; /* Button will align with input widths */
+    }
+
+    .inputs-container button:hover {
+      background-color: #2a8d7d;
+      box-shadow: 0 5px 8px rgba(0, 0, 0, 0.15);
+    }
+
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .side-by-side {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .side-by-side .box {
+      width: 48%;
+      padding: 15px;
+      background: #f4f4f4;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow-y: auto; 
+      max-height: 400px;
+    }
+
+    .side-by-side .box pre {
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      color: #333;
+      background: #f4f4f4;
+      padding: 10px;
+    }
+
+    .video-container video {
+      width: 100%;
+      height: 100%;
+    }
+    
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <a href="/">
+        <img src="/logo.svg" alt="Company Logo" width="150" height="50" id="logo" />
+      </a>
+      <h1 class="project-name">VAST-2-SGAI</h1>
+    </div>
+  </header>
+  <div class="side-by-side">
+    <div class="box inputs-container">
+      <h2>Try your own VAST!</h2>
+      <label for="duration-input">Ad slot duration:</label>
+      <input id="duration-input" type="text" placeholder="Enter duration (in seconds)" value="10" />
+      <label for="startdate-input">Start Date:</label>
+      <input id="startdate-input" type="text" placeholder="Enter start date" value="2024-11-13T13:55:00.000Z" />
+      <label for="resumeoffset-input">Resume Offset:</label>
+      <input id="resumeoffset-input" type="text" placeholder="Resume Offset" value="0" />
+      <label for="restrict-input">Restrict: </label>
+      <input id="restrict-input" type="text" placeholder="Restrict Offset" value="SKIP, JUMP" />
+      <label for="vast-url-input">
+        VAST file URL <br>
+        <small>(The provided VAST file MUST have at least one m3u8 media file.)</small>
+      </label>
+      <input id="vast-url-input" type="text" placeholder="Enter VAST URL"
+        value="http://localhost:3000/samples/sample-vast-1/vast-sample.xml" />
+      <button id="load-video">Load Video</button>
+    </div>
+    <div id="player-container" class="box video-container">
+      <video id="video" controls></video>
+    </div>
+  </div>
+  <div class="side-by-side">
+    <div class="box" id="vast-file">
+      <h3>VAST File</h3>
+      <pre><code id="vast-content" class="language-xml">Waiting for VAST file...</code></pre>
+
+    </div>
+    <div class="box" id="hls-assets">
+      <h3>Parsed Asset List</h3>
+      <pre><code id="assets-list" class="language-json">Waiting for asset-list...</code></pre>
+    </div>
+  </div>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+
+    if (Hls.isSupported()) {
+      const video = document.getElementById("video");
+      const vastContent = document.getElementById("vast-content");
+      const assetsList = document.getElementById("assets-list");
+      document.getElementById("load-video").addEventListener("click", () => {
+        const hls = new Hls({
+          enableInterstitialPlayback: true,
+          interstitialAppendInPlace: true,
+          interstitialLiveLookAhead: 20,
+        });
+        const duration = document.getElementById("duration-input").value;
+        const vastUrl = document.getElementById("vast-url-input").value;
+        const startDate = document.getElementById("startdate-input").value;
+        const resumeOffset = document.getElementById("resumeoffset-input").value;
+        const restrict = document.getElementById("restrict-input").value;
+        if (!duration || !vastUrl) {
+          alert("Please fill in both fields!");
+          return;
+        }
+
+        const sourceUrl = `main.m3u8?` +
+          `duration=${encodeURIComponent(duration)}&` +
+          `vasturl=${encodeURIComponent(vastUrl)}&` +
+          `startDate=${encodeURIComponent(startDate)}&` +
+          `resumeOffset=${encodeURIComponent(resumeOffset)}&` +
+          `restrict=${encodeURIComponent(restrict)}`;        hls.loadSource(sourceUrl);
+
+        hls.attachMedia(video);
+        
+        fetch(vastUrl)
+          .then(response => response.text())
+          .then(data => {
+            vastContent.textContent = data;
+            hljs.highlightElement(vastContent);
+          })
+          .catch(error => {
+            vastContent.textContent = "Failed to load VAST file.";
+            console.error(error);
+          });
+          
+          hls.on(Hls.Events.INTERSTITIAL_ASSET_STARTED, (_, data) => {
+            console.log("Received INTERSTITIAL_ASSET_STARTED event:", data);
+            const assetListResponse = data.event?.assetListResponse;
+
+            if (!assetListResponse || !assetListResponse.ASSETS?.length) {
+              console.warn("No valid assets found in the response.");
+              assetsList.textContent = "No valid assets found in the response.";
+              return;
+            }
+            assetsList.textContent = JSON.stringify(assetListResponse, null, 2);
+            hljs.highlightElement(assetsList);
+
+            console.log("Asset List Updated:", assetListResponse);
+        });
+
+        hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+          console.log("video and hls.js are now bound together !");
+        });
+        hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+          console.log("manifest loaded, found " + data.levels.length + " quality level");
+        });
+        hls.on(Hls.Events.INTERSTITIALS_UPDATED, (event, data) => {
+          console.log("INTERSTITIALS_UPDATED", data);
+        });
+        hls.on(Hls.Events.INTERSTITIALS_BUFFERED_TO_BOUNDARY, (event, data) => {
+          console.log("INTERSTITIALS_BUFFERED_TO_BOUNDARY", data);
+          console.log("hls interstitialsManager", hls.interstitialsManager);
+        });
+        hls.on(Hls.Events.ASSET_LIST_LOADING, (event, data) => {
+          console.log("ASSET_LIST_LOADING", data);
+        });
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          console.log("ERROR", data);
+        });
+        hls.on(Hls.Events.INTERSTITIAL_ASSET_PLAYER_CREATED, (event, data) => {
+          console.log("INTERSTITIAL_ASSET_PLAYER_CREATED", data);
+        });
+        hls.on(Hls.Events.ASSET_LIST_LOADED, (event, data) => {
+          console.log("ASSET_LIST_LOADED", data);
+        });
+        hls.on(Hls.Events.INTERSTITIAL_STARTED, (event, data) => {
+          console.log("INTERSTITIAL_STARTED", data);
+        });
+        hls.on(Hls.Events.INTERSTITIAL_ENDED, (event, data) => {
+          console.log("INTERSTITIAL_ENDED", data);
+        });
+        hls.on(Hls.Events.INTERSTITIAL_ASSET_STARTED, (event, data) => {
+          console.log("INTERSTITIAL_ASSET_STARTED", data);
+        });
+        hls.on(Hls.Events.INTERSTITIAL_ASSET_ENDED, (event, data) => {
+          console.log("INTERSTITIAL_ASSET_ENDED", data);
+        });
+        hls.on(Hls.Events.INTERSTITIALS_PRIMARY_RESUMED, (event, data) => {
+          console.log("INTERSTITIALS_PRIMARY_RESUMED", data);
+        });
+        hls.on(Hls.Events.INTERSTITIAL_ASSET_ERROR, (event, data) => {
+          console.log("INTERSTITIAL_ASSET_ERROR", data);
+        });
+        const adSignalingManager = new AdSignalingManager(hls);
+        const videoClicksPlugin = new VideoClicksPlugin(hls, {
+          container: document.getElementById("player-container")
+        });
+      });
+    }
+  </script>
+</body>
+</html>
