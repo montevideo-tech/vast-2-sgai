@@ -1,3 +1,5 @@
+const SUPPORTED_TRACKING_EVENTS = ["start", "firstQuartile", "midpoint", "thirdQuartile", "complete", "progress", "impression"];
+
 class AdSignalingManager {
   constructor(hls) {
     console.log("Initializing AdSignalingManager");
@@ -37,12 +39,14 @@ class AdSignalingManager {
     const currentTime = this.assetPlayer.currentTime;
 
     this.trackingEventsQueue.forEach((event, index) => {
-      const tolerance = 0.75; // time difference tolerance in seconds
-      if (
-        ((Math.abs(currentTime - event.start) <= tolerance) || event?.start === undefined)
-      ) {
-        Promise.all(event.urls.map((url) => this.sendTrackingEvent(url)));
-        this.trackingEventsQueue.splice(index, 1);
+      if (SUPPORTED_TRACKING_EVENTS.includes(event.type)) {
+        const tolerance = 0.75; // time difference tolerance in seconds
+        if (
+          (event?.offset === undefined || (Math.abs(currentTime - event.offset) <= tolerance))
+        ) {
+          Promise.all(event.urls.map((url) => this.sendTrackingEvent(url)));
+          this.trackingEventsQueue.splice(index, 1);
+        }
       }
     });
   };
