@@ -1,121 +1,85 @@
 const { logger } = require("../utils/logger.js");
-const QUARTILE = "quartile";
+
 const IMPRESSION = "impression";
+const PROGRESS = "progress";
 
 class TrackingEvent {
-  constructor(type, duration, urls, start) {
+  constructor(type, duration, urls) {
+    // console.log(">>>TRACKING EVT: ", type)
     this.type = type;
-    this.duration = duration;
+    //this.duration = duration;
     this.urls = urls;
-    this.start = start;
-  }
-}
+    //this.start = start;
 
-class StartEvent extends TrackingEvent {
-  constructor(duration, urls) {
-    super(QUARTILE, duration, urls, 0.0);
-  }
-}
+    if (this.type.startsWith(PROGRESS)) {
+      const offsetValue = this.type.split("-")[1];
+      if (offsetValue !== null) {
+        this.offset =
+          typeof offsetValue === "string" && offsetValue.includes("%")
+            ? (duration * parseFloat(offsetValue.replace("%", ""))) / 100
+            : parseFloat(offsetValue);
 
-class FirstQuartileEvent extends TrackingEvent {
-  constructor(duration, urls) {
-    super(QUARTILE, duration, urls, duration * 0.25);
-  }
-}
+        this.type = PROGRESS;
 
-class MidpointEvent extends TrackingEvent {
-  constructor(duration, urls) {
-    super(QUARTILE, duration, urls, duration * 0.5);
-  }
-}
+        if (
+          isNaN(this.offset) ||
+          this.offset < 0 ||
+          this.offset > this.duration
+        ) {
+          throw new Error(`Invalid start value: ${offset}`);
+        }
+      }
+    } else {
+      switch (type) {
+      case "start":
+        this.offset = 0;
+        break;
 
-class ThirdQuartileEvent extends TrackingEvent {
-  constructor(duration, urls) {
-    super(QUARTILE, duration, urls, duration * 0.75);
-  }
-}
+      case "firstQuartile":
+        this.offset = duration * 0.25;
+        break;
 
-class CompleteEvent extends TrackingEvent {
-  constructor(duration, urls) {
-    super(QUARTILE, duration, urls, duration);
-  }
-}
+      case "midpoint":
+        this.offset = duration * 0.5;
+        break;
 
-class ImpressionEvent extends TrackingEvent {
-  constructor(duration, urls) {
-    super(IMPRESSION, duration, urls);
-  }
-}
+      case "thirdQuartile":
+        this.offset = duration * 0.75;
+        break;
 
-class ProgressEvent extends TrackingEvent {
-  constructor(type, duration, urls, startValue) {
-    const start =
-      typeof startValue === "string" && startValue.includes("%")
-        ? (duration * parseFloat(startValue.replace("%", ""))) / 100
-        : parseFloat(startValue);
-
-    if (isNaN(start) || start < 0 || start > duration) {
-      throw new Error(`Invalid start value: ${startValue}`);
-    }
-
-    super(type, duration, urls, start);
-  }
-}
-
-class TrackingEventFactory {
-  static create(eventType, duration, urls) {
-    const eventMap = {
-      start: StartEvent,
-      firstQuartile: FirstQuartileEvent,
-      midpoint: MidpointEvent,
-      thirdQuartile: ThirdQuartileEvent,
-      complete: CompleteEvent,
-      impression: ImpressionEvent,
-    };
-
-    if (eventType in eventMap) {
-      return new eventMap[eventType](duration, urls);
-    }
-
-    if (eventType.startsWith("progress")) {
-      const progressValue = eventType.split("-")[1];
-      if (progressValue !== null) {
-        return new ProgressEvent(QUARTILE, duration, urls, progressValue);
+      case "complete":
+        this.offset = duration;
+        break;
       }
     }
-
-    throw new Error(`Invalid event type: ${eventType}`);
   }
 }
 
 class AdCreativeSignalingMapper {
   constructor(ad) {
     this.ad = ad;
+    console.log(">>>> Ad Tracking", this.ad.trackingEvents);
   }
 
   map() {
     const newTrackingEvents = this.ad.trackingEvents;
-    
-    if(this.ad?.impressions.length > 0)
-      newTrackingEvents[IMPRESSION] = this.ad.impressions.map((impression) => impression.url);
+
+    if (this.ad?.impressions.length > 0)
+      newTrackingEvents[IMPRESSION] = this.ad.impressions.map(
+        (impression) => impression.url
+      );
 
     const trackingEvents = Object.entries(this.ad.trackingEvents)
       .map(([eventType, urls]) => {
         try {
-          const event = TrackingEventFactory.create(
-            eventType,
-            this.ad.duration,
-            urls
-          );
-          return {
-            type: event.type,
-            start: event.start,
-            urls: event.urls,
-          };
+          const event = new TrackingEvent(eventType, this.ad.duration, urls);
+          //console.log(">>> track evt: ", event)
+          return event;
         } catch (error) {
           logger.warn(
             `Skipping invalid event: ${eventType}, Error: ${error.message}`
           );
+
           return null;
         }
       })
@@ -128,5 +92,4 @@ class AdCreativeSignalingMapper {
 module.exports = {
   AdCreativeSignalingMapper,
   TrackingEvent,
-  TrackingEventFactory,
 };
