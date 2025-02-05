@@ -1,7 +1,8 @@
 <head>
   <title>Sample API VASTID (LIVE)</title>
   <script src="../../hls.js/hls.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>  
+  <script src="../wse_api.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <style>
     video {
       height: 300px;
@@ -83,7 +84,8 @@
     </div>
   </header>
   <div class="samples">
-    <h1>Sample API VASTID (LIVE w/BBB)</h1>
+    <img src="/wse.png" height=40 style="vertical-align:middle" />
+    <h1 style="display:inline;vertical-align:middle">Sample API VASTID (LIVE w/BBB)</h1>
     <p>
       HLS, live, 1 ad parsed form
       <a href="vast-sample.xml">this Google IMA VAST example</a>
@@ -93,58 +95,15 @@
     </p>
     <p style="display:inline">
       <b>Insert: </b><pre style="display:inline">curl https://demo.entrypoint.cloud.wowza.com/v1/ads/applications/bbb/streams/mystream</pre>
+      <button onclick="sendGetRequest('bbb','mystream')">Insert Ad</button>
+      <button onclick="sendDeleteRequest('bbb','mystream')">Remove Ad</button>
+      <br><pre id="response">...</pre>
     </p>
     <div class="video-container">
       <video id="video" controls></video>
     </div>
   </div>
-  <button onclick="sendGetRequest2()">Send GET Request</button>
   <script>
-
-const sendGetRequest2 = async () => {
-    const result = await fetch(
-        "http://localhost:1935/v1/ads/applications/simu-live/streams/myStream",
-        {
-            method: "get"
-        }
-    );
-    console.log(result); //this will only be done after the await section, since the function is defined as async
-};
-
-function sendGetRequest() {
-      fetch('http://localhost:1935/v1/ads/applications/simu-live/streams/myStream', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data);
-        alert('Request sent successfully!');
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-        alert('Failed to send request');
-      });
-    }
-
-    function send_now()
-    {
-      //fetch("http://localhost:1935/v1/adds", {method: "GET"});
-      var request = $.ajax({
-        url: 'http://localhost:1935/v1/adds',
-        timeout:30000,
-        type: "GET"
-      });
-
-      // var xmlHttp = new XMLHttpRequest();
-      // xmlHttp.open( "GET", "http://localhost:1935/v1/adds", true ); // false for synchronous request
-      // xmlHttp.send( null );
-      // console.log(xmlHttp.responseText);
-      // return true;
-    }
-
 
     if (Hls.isSupported()) {
       var video = document.getElementById("video");

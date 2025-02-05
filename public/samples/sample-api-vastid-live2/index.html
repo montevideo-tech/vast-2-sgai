@@ -1,6 +1,8 @@
 <head>
   <title>Sample API 1</title>
   <script src="../../hls.js/hls.js"></script>
+  <script src="../wse_api.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>  
   <style>
     video {
       height: 300px;
@@ -82,9 +84,10 @@
     </div>
   </header>
   <div class="samples">
-    <h1>Sample API VASTID</h1>
+    <img src="/wse.png" height=40 style="vertical-align:middle" />
+    <h1 style="display:inline;vertical-align:middle">Sample API VASTID (LIVE w/WebRTC)</h1>
     <p>
-      HLS, interstitial@5sec, 1 ad parsed form
+      HLS, live, 1 ad parsed form
       <a href="vast-sample.xml">this Google IMA VAST example</a>
     </p>
     <p>
@@ -93,6 +96,9 @@
     </p>
     <p style="display:inline">
       <b>Insert: </b><pre style="display:inline">curl https://demo.entrypoint.cloud.wowza.com/v1/ads/applications/webrtc/streams/mystream</pre>
+      <button onclick="sendGetRequest('webrtc','mystream')">Insert Ad</button>
+      <button onclick="sendDeleteRequest('webrtc','mystream')">Remove Ad</button>
+      <br><pre id="response">...</pre>
     </p>
     <div class="video-container">
       <video id="video" controls></video>
