@@ -93,14 +93,14 @@
     <p>
       <b>Source: </b>rtsp Camera
     </p>
-    <p style="display:inline">
-      <b>Insert: </b><pre style="display:inline">curl https://demo.entrypoint.cloud.wowza.com/v1/ads/applications/camera/streams/mystream.stream</pre>
+    <span style="display:inline">
       <button onclick="sendGetRequest('camera','mystream.stream')">Insert Ad</button>
       <button onclick="sendDeleteRequest('camera','mystream.stream')">Remove Ad</button>
-      <br><pre id="response">...</pre>
-    </p>
+    </span><br>
+    <span><b>API Event: </b><pre id="response" style="display:inline">...</pre></span><br>
     <span><b>Current Time: </b><pre id="time" style="display:inline"></pre></span><br>
-    <span><b>Program Date Time: </b><pre id="program-date-time" style="display:inline">None</pre></span><br><br>
+    <span><b>Program Date Time: </b><pre id="program-date-time" style="display:inline">...</pre></span><br>
+    <span><b>Interstitial: </b><pre id="interstitial" style="display:inline">...</pre></span><br><br>    
     <div class="video-container">
       <video id="video" controls></video>
     </div>
@@ -127,6 +127,9 @@
 
       hls.on(Hls.Events.INTERSTITIALS_UPDATED, (event, data) => {
         console.log("INTERSTITIALS_UPDATED", data);
+        if(data.removedIds.length >= 1 ) {
+          $("#interstitial").text("...");
+        }
       });
 
       hls.on(Hls.Events.INTERSTITIALS_BUFFERED_TO_BOUNDARY, (event, data) => {
@@ -144,6 +147,7 @@
 
       hls.on(Hls.Events.INTERSTITIAL_ASSET_PLAYER_CREATED, (event, data) => {
         console.log("INTERSTITIAL_ASSET_PLAYER_CREATED", data);
+        $("#interstitial").text(data.asset.parentIdentifier + " @" + data.event.dateRange._startDate);
       });
 
       hls.on(Hls.Events.ASSET_LIST_LOADED, (event, data) => {
@@ -176,7 +180,7 @@
 
       hls.loadSource("https://demo.entrypoint.cloud.wowza.com/camera/mystream.stream/playlist.m3u8?user=1234&content=abc");
       hls.attachMedia(video);
-      startTime()
+      startTime();
     }
   </script>
 </body>
