@@ -10,7 +10,7 @@ function sendGetRequest(app,stream,attempt=1)
   $.post({
     url: 'https://demo.entrypoint.cloud.wowza.com/v1/ads/applications/'+app+'/streams/' + stream,
     type: 'post',
-    timeout: 2000,
+    timeout: 5000,
     tryCount : 0,
     retryLimit : 3,
     dataType: 'json',
@@ -55,7 +55,7 @@ function sendDeleteRequest(app,stream,attempt=1)
     url: 'https://demo.entrypoint.cloud.wowza.com/v1/ads/applications/'+app+'/streams/' + stream,
     type: 'delete',
     dataType: 'json',
-    timeout: 2000,
+    timeout: 5000,
     tryCount : 0,
     retryLimit : 3,    
     contentType: "application/json",
