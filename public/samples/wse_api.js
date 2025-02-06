@@ -5,6 +5,7 @@ function sendGetRequest(app,stream,attempt=1)
   var adObject = new Object();
   adObject.id = app + "-ad";
   adObject.start_date = "+10";
+  adObject.asset_list = "https://vast2sgai.qualabs.com/samples/api/asset-list?vasturl=http://localhost:3000/samples/sample-api-vastid-live/vast-sample.xml&test=false&user=user&content=content"
 
   $.post({
     url: 'https://demo.entrypoint.cloud.wowza.com/v1/ads/applications/'+app+'/streams/' + stream,
