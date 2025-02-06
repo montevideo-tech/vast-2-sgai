@@ -1,8 +1,8 @@
 <head>
   <title>Sample API 1</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="../../hls.js/hls.js"></script>
   <script src="../wse_api.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>  
   <style>
     video {
       height: 300px;
@@ -100,7 +100,8 @@
       <button onclick="sendDeleteRequest('webrtc','mystream')">Remove Ad</button>
       <br><pre id="response">...</pre>
     </p>
-    <span><b>Current Time: </b><pre id="time" style="display:inline"></pre></span><br><br>
+    <span><b>Current Time: </b><pre id="time" style="display:inline"></pre></span><br>
+    <span><b>Program Date Time: </b><pre id="program-date-time" style="display:inline">None</pre></span><br><br>
     <div class="video-container">
       <video id="video" controls></video>
     </div>
@@ -176,6 +177,7 @@
 
       hls.loadSource("https://demo.entrypoint.cloud.wowza.com/webrtc/mystream/playlist.m3u8?user=1234&content=abc");
       hls.attachMedia(video);
+      startTime()
     }
   </script>
 </body>

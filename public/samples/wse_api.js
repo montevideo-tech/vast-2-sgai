@@ -22,7 +22,9 @@ function sendGetRequest(app,stream,attempt=1)
     },
     error: function (xhr, ajaxOptions, thrownError) {
       if(xhr.status == 0) {
-        console.log("insert failed:" + xhr.status + "=>" + xhr.responseText + " (attempt:" + attempt + ")");
+        var msg = "insert failed:" + xhr.status + "=>" + xhr.responseText + " (attempt:" + attempt + ")"
+        $('#response').text(msg);
+        console.log(msg);
         if(attempt < 2) {
           console.log("Retyring");
           sendGetRequest(app,stream,attempt+1);
@@ -87,6 +89,7 @@ function sendDeleteRequest(app,stream,attempt=1)
 }    
 
 function checkTime(i) {
+  // add a zero in front of numbers<10
   if (i < 10) {
     i = "0" + i;
   }
@@ -95,15 +98,13 @@ function checkTime(i) {
 
 function startTime() {
   var today = new Date();
-  var h = today.getUTCHours();
-  var m = today.getUTCMinutes();
-  var s = today.getUTCSeconds();
-  // add a zero in front of numbers<10
-  m = checkTime(m);
-  s = checkTime(s);
-  t = setTimeout(function() {
+  $('#time').text(checkTime(today.getUTCHours()) + ":" + checkTime(today.getUTCMinutes()) + ":" + checkTime(today.getUTCSeconds()));
+
+  if (hls && hls.playingDate){
+    var programDateTime = hls.playingDate
+    $('#program-date-time').text(checkTime(programDateTime.getUTCHours()) + ":" + checkTime(programDateTime.getUTCMinutes()) + ":" + checkTime(programDateTime.getUTCSeconds()));
+  }
+  setTimeout(function() {
     startTime()
   }, 500);
-  $('#time').text(h + ":" + m + ":" + s);
 }
-setTimeout(function() { startTime() }, 500);
