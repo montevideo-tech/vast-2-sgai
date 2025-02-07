@@ -93,14 +93,14 @@
     <p>
       <b>Source: </b>rtmp <pre>ffmpeg -stats -re -f lavfi -i testsrc=size=1280x720,format=yuv420p -f lavfi -i anullsrc -vf "drawtext=fontsize=120:fontcolor=black:text='%{gmtime\:%T}':x=24:y=24,drawtext=fontsize=120:fontcolor=white:text='%{gmtime\:%T}':x=20:y=20"  -c:v libx264 -g 50 -c:a aac -f flv rtmp://demo.entrypoint.cloud.wowza.com/rtmp/mystream</pre>
     </p>
-    <p style="display:inline">
-      <b>Insert: </b><pre style="display:inline">curl https://demo.entrypoint.cloud.wowza.com/v1/ads/applications/rtmp/streams/mystream</pre>
+    <span style="display:inline">
       <button onclick="sendGetRequest('rtmp','mystream')">Insert Ad</button>
       <button onclick="sendDeleteRequest('rtmp','mystream')">Remove Ad</button>
-      <br><pre id="response">...</pre>
-    </p>
+    </span><br>
+    <span><b>API Event: </b><pre id="response" style="display:inline">...</pre></span><br>
     <span><b>Current Time: </b><pre id="time" style="display:inline"></pre></span><br>
-    <span><b>Program Date Time: </b><pre id="program-date-time" style="display:inline">None</pre></span><br><br>
+    <span><b>Program Date Time: </b><pre id="program-date-time" style="display:inline">...</pre></span><br>
+    <span><b>Interstitial: </b><pre id="interstitial" style="display:inline">...</pre></span><br><br>    
     <div class="video-container">
       <video id="video" controls></video>
     </div>
@@ -127,6 +127,9 @@
 
       hls.on(Hls.Events.INTERSTITIALS_UPDATED, (event, data) => {
         console.log("INTERSTITIALS_UPDATED", data);
+        if(data.removedIds.length >= 1 ) {
+          $("#interstitial").text("...");
+        }
       });
 
       hls.on(Hls.Events.INTERSTITIALS_BUFFERED_TO_BOUNDARY, (event, data) => {
@@ -144,6 +147,7 @@
 
       hls.on(Hls.Events.INTERSTITIAL_ASSET_PLAYER_CREATED, (event, data) => {
         console.log("INTERSTITIAL_ASSET_PLAYER_CREATED", data);
+        $("#interstitial").text(data.asset.parentIdentifier + " @" + data.event.dateRange._startDate);
       });
 
       hls.on(Hls.Events.ASSET_LIST_LOADED, (event, data) => {
@@ -176,7 +180,7 @@
 
       hls.loadSource("https://demo.entrypoint.cloud.wowza.com/rtmp/mystream/playlist.m3u8?user=1234&content=abc");
       hls.attachMedia(video);
-      startTime()
+      startTime();
     }
   </script>
 </body>

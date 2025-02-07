@@ -4,13 +4,13 @@ function sendGetRequest(app,stream,attempt=1)
   $('#response').text("...");
   var adObject = new Object();
   adObject.id = app + "-ad";
-  adObject.start_date = "+10";
-  adObject.asset_list = "https://vast2sgai.qualabs.com/samples/api/asset-list?vasturl=http://localhost:3000/samples/sample-api-vastid-live/vast-sample.xml&test=false&user=user&content=content"
+  //adObject.start_date = "+10";
+  adObject.asset_list = "https://vast2sgai.qualabs.com/api/asset-list?vasturl=http://vast2sgai.qualabs.com/samples/sample-api-vastid-live/vast-sample.xml&test=false&user=user&content=content"
 
   $.post({
     url: 'https://demo.entrypoint.cloud.wowza.com/v1/ads/applications/'+app+'/streams/' + stream,
     type: 'post',
-    timeout: 5000,
+    timeout: 2000,
     tryCount : 0,
     retryLimit : 3,
     dataType: 'json',
@@ -19,14 +19,14 @@ function sendGetRequest(app,stream,attempt=1)
     success: function (okdata) {
       msg = "OK:"+okdata;
       console.log(msg);
-      $('#response').text(msg);      
+      $('#response').text(msg.trim());      
     },
     error: function (xhr, ajaxOptions, thrownError) {
       if(xhr.status == 0) {
         var msg = "insert failed:" + xhr.status + "=>" + xhr.responseText + " (attempt:" + attempt + ")"
-        $('#response').text(msg);
+        $('#response').text(msg.trim());
         console.log(msg);
-        if(attempt < 2) {
+        if(attempt < 3) {
           console.log("Retyring");
           sendGetRequest(app,stream,attempt+1);
         } else {
@@ -35,12 +35,12 @@ function sendGetRequest(app,stream,attempt=1)
       } else if(xhr.status == 200) {
         msg = "insert ok:" + xhr.status + "=>" + xhr.responseText;
         console.log(msg);
-        $('#response').text(msg);
+        $('#response').text(msg.trim());
       }
       else {
         msg = "insert failed:" + xhr.status + "=>" + xhr.responseText;
         console.log(msg);
-        $('#response').text(msg);
+        $('#response').text(msg.trim());
       }
     }
   });
@@ -55,7 +55,7 @@ function sendDeleteRequest(app,stream,attempt=1)
     url: 'https://demo.entrypoint.cloud.wowza.com/v1/ads/applications/'+app+'/streams/' + stream,
     type: 'delete',
     dataType: 'json',
-    timeout: 5000,
+    timeout: 2000,
     tryCount : 0,
     retryLimit : 3,    
     contentType: "application/json",
@@ -63,27 +63,27 @@ function sendDeleteRequest(app,stream,attempt=1)
     success: function (okdata) {
       msg = "Deleted";
       console.log(msg);
-      $('#response').text(msg);      
+      $('#response').text(msg.trim());      
     },
     error: function (xhr, ajaxOptions, thrownError) {
       if(xhr.status == 0) {
         msg = "delete failed:" + xhr.status + "=>" + xhr.responseText + " (attempt:" + attempt + ")";
         console.log(msg);
-        if(attempt < 2) {
+        if(attempt < 3) {
           console.log("trying...");
           sendDeleteRequest(app,stream,attempt+1);
         } else {
-          $('#response').text(msg);      
+          $('#response').text(msg.trim());      
         }
       } else if(xhr.status == 204) {
         msg = "delete ok:" + xhr.status + "=>" + xhr.responseText;
         console.log(msg);
-        $('#response').text(msg);      
+        $('#response').text(msg.trim());      
       }
       else {
         msg = "delete failed:" + xhr.status + "=>" + xhr.responseText;
         console.log(msg);
-        $('#response').text(msg);
+        $('#response').text(msg.trim());
       }
     }
   });
