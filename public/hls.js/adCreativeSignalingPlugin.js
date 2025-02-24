@@ -18,7 +18,7 @@ class AdSignalingManager {
       const asset = assetListResponse.ASSETS?.[assetListIndex];
       const creativeSignaling = asset?.["X-AD-CREATIVE-SIGNALING"];
       const trackingEvents = creativeSignaling?.payload?.[0]?.tracking ?? [];
-      this.trackingEventsQueue = trackingEvents;
+      this.trackingEventsQueue = [...trackingEvents];
     });
 
     hls.on(Hls.Events.INTERSTITIAL_ASSET_ENDED, async (_, data) => {
