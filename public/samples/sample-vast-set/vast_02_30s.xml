@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast.xsd" version="4.0">
+ <Ad id="222">
+  <InLine>
+   <AdSystem>Sample</AdSystem>
+   <AdTitle>External - Single Inline Linear</AdTitle>
+   <Description><![CDATA[External - Single Inline Linear ad]]></Description>
+   <Error><![CDATA[https://pubads.g.doubleclick.net/pagead/interaction/?ai=BBKW5CfJEZ62IDvyV9cYP7YKIiA6D6qWVRgAAABABII64hW84AViLgsbBgwRg2wa6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gInLzIxNzc1NzQ0OTIzL2V4dGVybmFsL3NpbmdsZV9hZF9zYW1wbGVz-ALw0R6AAwGQA5wEmAOkA6gDAeAEAdIFBhCPpcSJFpAGAaAGI6gHuL6xAqgHmgaoB5fFsQKoB_PRG6gHltgbqAeqm7ECqAeDrbECqAfgvbECqAf_nrECqAffn7ECqAf4wrECqAf7wrEC2AcB4AcB0ggmCIBhEAEYHTICigI6C4BAgMCAgICgqIACSL39wTpYuJG1sbz4iQPYCAKACgWYCwGqDQJVWeoNEwiEw7WxvPiJAxX8St0CHW0BAuHQFQH4FgGAFwE&sigh=xlYT2MSskww&label=videoplayfailed[ERRORCODE]]]></Error>
+   <Impression><![CDATA[https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjsuCfL3ZNnhbg_a7-O_u_52rNU2ZH0wzjDK6p8RvSjVabfBCemoZkWfh_ufofi42_EaMwjnAm6izNSwMtjw4zjL_ldJwRngv69pnX8JHygflwwIbWTfvf7UjiDzRRdqTPtdEXYPta2FekCo5xk3dJaG5cC3Rpg1SyERW_45Oi_aEJgRj0yPwi6k8PTEZyEMvDSivnxg6ugHgNC4t0vcmshEXIMzrrjBR_1zdABGl1uekICltnEszbh0OGebSfK0-OXYVKWrsRlLTuetLrCnMSg5ryiJgBgQqy0Ru-EatGOrJImUi_DQhTZOkpuMiA2VjVUfN3Bjxvh2EQj35XwZ-fzVE9HiO1UhbDEcl_mbl0K_4m4jKKASBhtLGpQEY4vUnJS0T&sai=AMfl-YQ7B8i4NrbUfQ9S187Usq3gXFnsUoeKRdRr64CWpefMsisLtzciK-YF7EvXx8xHlLT5Mmgld1EiWF92&sig=Cg0ArKJSzEtPlPUBNDbREAE&uach_m=%5BUACH%5D&adurl=]]></Impression>
+   <Creatives>
+    <Creative id="22222222" AdID="A22222222" sequence="1">
+     <Linear>
+      <Duration>00:00:30</Duration>
+      <TrackingEvents>
+       <Tracking event="start"><![CDATA[http://localhost:8000/?event=start]]></Tracking>
+       <Tracking event="firstQuartile"><![CDATA[http://localhost:8000/?event=firstQuartile]]></Tracking>
+       <Tracking event="midpoint"><![CDATA[http://localhost:8000/?event=midpoint]]></Tracking>
+       <Tracking event="thirdQuartile"><![CDATA[http://localhost:8000/?event=thirdQuartile]]></Tracking>
+       <Tracking event="complete"><![CDATA[http://localhost:8000/?event=complete]]></Tracking>
+       <Tracking event="mute"><![CDATA[http://localhost:8000/?event=mute]]></Tracking>
+       <Tracking event="unmute"><![CDATA[http://localhost:8000/?event=unmute]]></Tracking>
+       <Tracking event="rewind"><![CDATA[http://localhost:8000/?event=rewind]]></Tracking>
+       <Tracking event="pause"><![CDATA[http://localhost:8000/?event=pause]]></Tracking>
+       <Tracking event="resume"><![CDATA[http://localhost:8000/?event=resume]]></Tracking>
+       <Tracking event="creativeView"><![CDATA[http://localhost:8000/?event=creativeView]]></Tracking>
+       <Tracking event="fullscreen"><![CDATA[http://localhost:8000/?event=fullscreen]]></Tracking>
+       <Tracking event="acceptInvitationLinear"><![CDATA[http://localhost:8000/?event=acceptInvitationLinear]]></Tracking>
+       <Tracking event="closeLinear"><![CDATA[http://localhost:8000/?event=closeLinear]]></Tracking>
+       <Tracking event="exitFullscreen"><![CDATA[http://localhost:8000/?event=exitFullscreen]]></Tracking>
+      </TrackingEvents>
+      <VideoClicks>
+       <ClickThrough id="GDFP"><![CDATA[https://pubads.g.doubleclick.net/pcs/click?xai=AKAOjstxAPF4SZnn9lWQUI2tmCNyzbKk-0JnxSiAXSpuS8JiOQ8Jq7G2Ddo-sd6NprqcRGw4TyhC4e-JtiqZq5ZyIuqCfyhPiGXDaN7YOBWcaqIMlLPRGaJthOOa1bc4suuBlCuqovdhNlUgAgjn0fxehHODfc12ZQYmKhomhS0PFqwV1F0eQEUNQXqlnuQadbpdrXnsOzD3T32hudbqJRBPHoPaxbhB37HppdA29rrw0jwcFg9iR3l3tAymjUQq618KtR7FC6gEM-Sk3-NBEjeLO8MCk2XhVuTcDEkgNz1DaMQ2ah0EpuP70VfxyIn9nkXuScpQt-eEcVoa59qjnCIkyo1T2g3Pp4P4uC1J380KV5g83hOU&sai=AMfl-YSBya7Y7IUK4BcI3zUIECXHKDBOJs5xNQrJwHJHp4vMAkLWBnPUbCMOAdckTJtgsS_tPeoQFf18ngGt&sig=Cg0ArKJSzHVI0ajoHYe0&fbs_aeid=%5Bgw_fbsaeid%5D&adurl=https://googleads.github.io/googleads-ima-html5/vsi/]]></ClickThrough>
+      </VideoClicks>
+      
+      <MediaFiles>
+       <MediaFile id="GDFP" delivery="progressive" width="1280" height="720" type="video/mp4" bitrate="2200" scalable="true" maintainAspectRatio="true"><![CDATA[https://d3gf4nhd4u6icy.cloudfront.net/nico/ad01_30s/hls_manifests/master_manifest.mp4]]></MediaFile>
+       <MediaFile id="GDFP" delivery="streaming" width="1280" height="720" type="application/x-mpegURL" minBitrate="800" maxBitrate="2200" scalable="true" maintainAspectRatio="true"><![CDATA[https://d3gf4nhd4u6icy.cloudfront.net/nico/ad01_30s/hls_manifests/master_manifest.m3u8]]></MediaFile>
+       <MediaFile id="GDFP" delivery="streaming" width="1280" height="720" type="application/dash+xml" scalable="true" maintainAspectRatio="true"><![CDATA[https://d3gf4nhd4u6icy.cloudfront.net/nico/ad01_30s/hls_manifests/master_manifest.mpd]]></MediaFile>
+      </MediaFiles>
+     </Linear>
+    </Creative>
+   </Creatives>
+  </InLine>
+ </Ad> 
+</VAST>

@@ -56,7 +56,9 @@ resource "aws_ecs_task_definition" "backend" {
     "image": "${aws_ecr_repository.backend.repository_url}",
     "essential": true,
     "environment": [
-      {"name": "NODE_ENV", "value": "${terraform.workspace}"}
+      {"name": "NODE_ENV", "value": "${terraform.workspace}"},
+      {"name": "VAST_MAPPING_JSON", "value": "{\"1\" : \"http://localhost:3000/samples/sample-vast-set/vast_01_15s.xml\",\"2\" : \"http://localhost:3000/samples/sample-vast-set/vast_02_30s.xml\",\"3\" : \"http://localhost:3000/samples/sample-vast-set/vast_03_30s.xml\",\"4\" : \"http://localhost:3000/samples/sample-vast-set/vast_04_15s.xml\",\"5\" : \"http://localhost:3000/samples/sample-vast-set/vast_05_15s.xml\",\"6\" : \"http://localhost:3000/samples/sample-vast-set/vast_06-7_30s.xml\",\"7\" : \"http://localhost:3000/samples/sample-vast-set/vast_06-7_30s.xml\",\"8\" : \"http://localhost:3000/samples/sample-vast-set/vast_08_15s.xml\",\"9\" : \"http://localhost:3000/samples/sample-vast-set/vast_09_15s.xml\"}"}
+
     ],
     "portMappings": [
       {
