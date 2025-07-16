@@ -1,63 +1,282 @@
 # VAST-2-SGAI
 
-## Overview
+This project aims to create an open-source tool that converts VAST XML files into HLS interstitial AssetLists and DASH Alternative MPD, supporting Server-Guided Ad Insertion (SGAI).
 
-### Introduction
-This is a project developed in the context of the **Montevideo TECH Summer Camp 2025**! During the Summer Camp, this project aims to create value for the video community while participants learn and share knowledge, fostering collaborative growth and making a positive impact together on the video community.
+## Table of Contents
 
-### Project Goal
-This project aims to create an open-source tool that converts VAST XML files into HLS interstitial AssetLists, supporting Server-Guided Ad Insertion (SGAI) without requiring Server-Side Ad Insertion (SSAI) providers. 
-
-### Project Duration
-**Start Date:** November 11  
-**End Date:** January 31  
-
+1.  [How to Run](#how-to-run)
+2.  [Service Configuration](#service-configuration)
+3.  [APIs](#apis)
+    *   [`GET /api/asset-list`](#get-apiasset-list)
+    *   [`GET /api/list-mpd`](#get-apilist-mpd)
+    *   [`GET / POST /api/sign`](#get--post-apisign)
+4.  [Deployment](#deployment)
+    *   [Using Docker (Recommended)](#using-docker-recommended)
+    *   [Using Node.js Directly](#using-nodejs-directly)
+    *   [Reverse Proxy (Recommended for Production)](#reverse-proxy-recommended-for-production)
+5.  [Available Examples](#available-examples)
+6.  [Communication Channels](#communication-channels)
 
 ## How to run
-1. Start the project
 
-    With Node:
+1.  **Start the project**
+
+    There are two main ways to run the project:
+
+    *   **Using Docker Compose (Recommended for most users):**
+        ```bash
+        docker compose up
+        ```
+        This command will build the Docker image (if not already built) and start the service. The service will be available at `http://localhost:3000`.
+
+    *   **Using Node.js directly:**
+        ```bash
+        npm install
+        npm run dev
+        ```
+        This will start the development server using `nodemon`, which automatically restarts the application when file changes are detected.
+
+2.  **Access the examples**
+
+    Once the server is running, open a browser and navigate to `http://localhost:3000` to see the main page with links to various examples.
+
+    **Note on Environment Variables:**
+    The project uses environment variables for configuration. A template file `.env.example` is provided. You can copy this to a `.env` file and customize the values as needed. These variables control aspects like the port, API behavior, and security settings. See the "Service Configuration" section for more details.
+
+## Service Configuration
+
+The service can be configured using environment variables. Create a `.env` file in the root of the project (you can copy `.env.example` as a starting point) and set the following variables as needed:
+
+*   `PORT`: The port on which the server will listen. Defaults to `3000`.
+*   `PINO_LOG_LEVEL`: Sets the logging level for the application. Common values are `debug`, `info`, `warn`, `error`. Defaults to `debug`.
+*   `API_DISABLE_SIGN`: If set to `true`, disables the `/api/sign` endpoint, preventing the generation of new JWTs. Defaults to `false`.
+*   `JWT_SECRET_KEY`: A secret key used to sign and verify JWTs. You should generate a strong, unique key for production environments. You can generate one using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
+*   `JWT_BYPASS_VALIDATION`: If set to `true`, JWT validation will be bypassed. This is **not recommended for production**. Defaults to `false`.
+*   `JWT_EXPIRES_IN`: Defines the expiration time for JWTs (e.g., `1h`, `7d`, `10y`). Defaults to `10y`.
+*   `VAST_WHITELIST`: A comma-separated list of domains that are allowed to be used in the `vasturl` parameter if JWT is not used. Example: `www.example.com,adserver.anotherdomain.net`.
+*   `ORIGIN_WHITELIST`: A comma-separated list of origins (e.g., `http://localhost:8080,https://myplayer.com`) that are allowed to make requests to the API. If empty, all origins are allowed (CORS `*`).
+*   `VAST_MAPPING_JSON`: A JSON string that maps short IDs to full VAST URLs. This is used by the `vastid` parameter. Example: `{"1": "http://example.com/vast1.xml", "promo": "http://anotherexample.com/promo.xml"}`. The keys will be used as values for the `vastid` query parameter.
+
+To apply these settings, ensure the `.env` file is present in the project root before starting the application. If using Docker, the variables can also be set in the `docker-compose.yml` file or passed directly during container runtime.
+
+## APIs
+
+The service exposes the following API endpoints:
+
+### `GET /api/asset-list`
+
+Converts a VAST XML into an HLS AssetList JSON format, suitable for Server-Guided Ad Insertion (SGAI).
+
+*   **Purpose**: To provide a list of ad assets that can be directly consumed by HLS players supporting interstitial events.
+*   **Request Parameters**:
+    *   `vasturl=<URL>`: The direct URL to a VAST XML file. This parameter is subject to the `VAST_WHITELIST` if no `jwt` is provided.
+    *   `vastid=<ID>`: An ID that maps to a VAST URL pre-configured in the `VAST_MAPPING_JSON` environment variable.
+    *   `jwt=<TOKEN>`: A JSON Web Token previously generated by the `/api/sign` endpoint. The VAST URL is embedded within this token, bypassing the whitelist.
+    *   _Additional query parameters_: Any other query parameters sent to this endpoint will be appended to the VAST URL before fetching it. This allows for dynamic parameter passing to the VAST server (e.g., for cache busting or user tracking).
+*   **Response**:
+    *   `200 OK`: Returns a JSON object representing the HLS AssetList.
+        ```json
+        {
+          "ASSETS": [
+            {
+              "URI": "URL_to_ad_creative.mp4",
+              "DURATION": 15.0,
+              "X-AD-CREATIVE-SIGNALING": { /* ... Ad signaling data ... */ },
+              "X-VAST2SGAI-VIDEOCLICKS": { /* ... Click tracking data ... */ }
+            }
+            // ... more assets if present in VAST
+          ]
+        }
+        ```
+    *   `400 Bad Request`: If required parameters are missing, the VAST URL is invalid, or VAST parsing fails.
+    *   `401 Unauthorized`: If `jwt` is invalid or other security checks fail.
+
+### `GET /api/list-mpd`
+
+Converts a VAST XML into an MPEG-DASH MPD of `type="list"`. This MPD will contain a sequence of Periods, each importing an ad creative's MPD.
+
+*   **Purpose**: To provide a structured list of ad content manifest URLs, allowing a DASH player to play a sequence of ads from their individual MPDs. This is particularly useful for scenarios where ads are served as separate, complete MPDs.
+*   **Request Parameters**:
+    *   `vasturl=<URL>`: The direct URL to a VAST XML file (subject to `VAST_WHITELIST` if no `jwt`).
+    *   `vastid=<ID>`: An ID from `VAST_MAPPING_JSON`.
+    *   `jwt=<TOKEN>`: A JWT containing the VAST URL.
+    *   _Additional query parameters_: Appended to the VAST URL before fetching it.
+*   **Response**:
+    *   `200 OK`: Returns an XML document with `Content-Type: application/dash+xml`. The MPD will be of `type="list"` and conform to the `urn:mpeg:dash:profile:list:2024` profile.
+        ```xml
+        <?xml version="1.0" encoding="UTF-8"?>
+        <MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="urn:mpeg:dash:schema:mpd:2011"
+          xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 DASH-MPD.xsd"
+          type="list" minBufferTime="PT1S"
+          profiles="urn:mpeg:dash:profile:list:2024"
+          publishTime="YYYY-MM-DDTHH:MM:SS.mmmZ">
+          <Period id="1" duration="PT[Ad1Duration]S">
+            <ImportedMPD uri="[URL_to_Ad1_MPD]" earliestResolutionTimeOffset="0"/>
+          </Period>
+          <Period id="2" duration="PT[Ad2Duration]S">
+            <ImportedMPD uri="[URL_to_Ad2_MPD]" earliestResolutionTimeOffset="[Time_to_load]"/>
+          </Period>
+          <!-- ... more Periods for additional ads ... -->
+        </MPD>
+        ```
+        *   `publishTime`: The time when this list MPD was generated.
+        *   Each `<Period>` corresponds to an ad from the VAST.
+        *   `duration`: The duration of the ad creative (e.g., `PT15S` for 15 seconds).
+        *   `<ImportedMPD uri="..." />`: Specifies the URL to the MPD of the individual ad creative.
+        *   `earliestResolutionTimeOffset`: Indicates the earliest time, relative to the start of the Period, at which the player may attempt to resolve the `ImportedMPD` URI. It's `0` for the first Period and typically a value like `10` (seconds) for subsequent Periods, allowing for staggered resolution.
+    *   `400 Bad Request`: For invalid parameters or VAST processing issues.
+    *   `401 Unauthorized`: For security violations (e.g., invalid JWT).
+
+### `GET / POST /api/sign`
+
+Generates a JSON Web Token (JWT) for a given VAST URL. This token can then be used with the `jwt` parameter in the `/api/asset-list` and `/api/list-mpd` endpoints.
+
+*   **Purpose**: To securely authorize requests for specific VAST URLs without needing to whitelist them, and to prevent tampering with the VAST URL.
+*   **Request**:
+    *   **GET**: The VAST URL must be provided as a query parameter: `/api/sign?url=<VAST_URL_to_sign>`.
+    *   **POST**: The VAST URL must be provided in the JSON body: `{ "url": "<VAST_URL_to_sign>" }`.
+*   **Response**:
+    *   `200 OK`: Returns a plain text string containing the generated JWT.
+    *   `400 Bad Request`: If the `url` parameter/body field is missing.
+    *   `401 Unauthorized`: If the `API_DISABLE_SIGN` environment variable is set to `true`.
+*   **Note**: The security of this endpoint relies on the `JWT_SECRET_KEY`. Ensure this key is kept confidential.
+
+## Deployment
+
+This section provides guidance on deploying the VAST-2-SGAI service.
+
+### Using Docker (Recommended)
+
+The most straightforward way to deploy the application is by using Docker. The project includes a `Dockerfile` for building the image and a `docker-compose.yml` for orchestration, which is suitable for both development and production-like environments.
+
+1.  **Build the Docker Image**:
+    If you need to build the image manually (e.g., for a custom registry or environment), you can use:
+    ```bash
+    docker build -t vast-2-sgai .
     ```
-    npm install
-    npm run dev
+
+2.  **Run with Docker Compose**:
+    For a typical deployment, you can adapt the existing `docker-compose.yml` or create a production-specific one.
+    *   Ensure you have a `.env` file in the project root with your production configurations (see "Service Configuration" section). Docker Compose will automatically pick up this file.
+    *   Start the service:
+        ```bash
+        docker compose -f docker-compose.yml up -d
+        ```
+        The `-d` flag runs the container in detached mode.
+
+3.  **Run directly with `docker run`**:
+    Alternatively, you can run the built image directly:
+    ```bash
+    docker run -d -p 3000:3000 --env-file ./.env vast-2-sgai
     ```
-    or  Docker Compose
+    Make sure your `.env` file is correctly populated and accessible. You might need to adjust the port mapping (`-p`) as per your requirements.
+
+### Using Node.js Directly
+
+While Docker is recommended for ease of deployment and consistency, you can also run the application directly using Node.js in a production environment.
+
+1.  **Prerequisites**:
+    *   Node.js (version specified in `Dockerfile` or newer LTS)
+    *   npm
+
+2.  **Setup**:
+    *   Clone the repository to your server.
+    *   Create a `.env` file with your production configurations.
+    *   Install dependencies:
+        ```bash
+        npm install --omit=dev
+        ```
+        The `--omit=dev` flag (or `NODE_ENV=production npm install` for older npm versions) installs only production dependencies.
+
+3.  **Run the Application**:
+    Start the application using a process manager like PM2, which provides features like automatic restarts, logging, and monitoring.
+    ```bash
+    npm start
     ```
-    docker compose up
+    Or, if using PM2:
+    ```bash
+    pm2 start src/server.js --name vast-2-sgai
     ```
-2. Open a browser in `http://localhost:3000` to try the examples
 
-## Communication Channels
+### Reverse Proxy (Recommended for Production)
 
-- **[video-dev.org](https://video-dev.org)**: Join us on the `#montevideo-summerprojects` channel to discuss the project, share updates, and collaborate.
-- **GitHub Repository**: Follow and contribute at [montevideo-tech/vast-2-sgai](https://github.com/montevideo-tech/vast-2-sgai).
+For any serious production deployment, it's highly recommended to run the application behind a reverse proxy like Nginx or Apache.
 
-## Methodology
+*   **Benefits**:
+    *   **SSL/TLS Termination**: Handle HTTPS traffic and manage SSL certificates.
+    *   **Load Balancing**: If you plan to run multiple instances of the application.
+    *   **Caching**: Serve static assets or cache API responses.
+    *   **Security**: Additional layer of protection (e.g., rate limiting, IP blocking).
 
-We follow a collaborative, issue-driven development approach with regular meetings to discuss ongoing work and new developments.
+*   **Example Nginx Configuration Snippet**:
+    ```nginx
+    server {
+        listen 80;
+        server_name yourdomain.com;
 
-### Issues
-All topics related to development and design are logged and tracked via GitHub Issues at [Issues Page](https://github.com/montevideo-tech/vast-2-sgai/issues).
+        # Redirect HTTP to HTTPS
+        location / {
+            return 301 https://$host$request_uri;
+        }
+    }
 
-1. **Creating Issues**: Participants can create and report issues covering development topics, feature requests, bugs, or any other relevant discussion points.
-2. **Tagging for Discussion**: Issues tagged with `next meeting` will be discussed in the upcoming meeting. Participants should ideally review and comment on these issues beforehand.
+    server {
+        listen 443 ssl;
+        server_name yourdomain.com;
 
-### Weekly Meetings
+        ssl_certificate /etc/nginx/ssl/yourdomain.com.crt;
+        ssl_certificate_key /etc/nginx/ssl/yourdomain.com.key;
 
-_meetigns MAY vary, please follow the discussions in [video-dev.org](https://video-dev.org) `#montevideo-summerprojects` channel_
+        location / {
+            proxy_pass http://localhost:3000; # Assuming VAST-2-SGAI runs on port 3000
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+    ```
+    Remember to replace `yourdomain.com` and paths to SSL certificates.
 
-- **Frequency**: Every Thursday  
-- **Time**: 9 a.m. PST (12 p.m. EST)
-- **Link**: https://meet.google.com/crh-zrtc-guz
+## Available Examples
 
-During each meeting:
-1. **Discussion on Tagged Issues**: We’ll focus on issues tagged `next meeting`, aiming to resolve roadblocks and outline actionable steps.
-2. **Preparation**: We encourage each participant to review and comment on tagged issues ahead of time, ensuring an efficient and informed discussion.
+The project includes several examples in the `public/samples/` directory. When the server is running (e.g., via `docker compose up` or `npm run dev`), these can be accessed at `http://localhost:3000/samples/`.
 
-## Documentation
+Each example typically includes an `index.html` file that demonstrates a particular feature or use case.
 
-**Digital Whiteboard**: A visual tool used during meetings to support discussions can be accessed [here](https://drive.google.com/file/d/1MPodWl1R3DhgWXG54HC3dLo7qD7aTzZT/view?usp=sharing).
+*   **`asset-list-1`**: [Access Example](http://localhost:3000/samples/asset-list-1/)
+    *   Demonstrates a basic HLS stream with a single interstitial ad inserted at 5 seconds.
+*   **`asset-list-2`**: [Access Example](http://localhost:3000/samples/asset-list-2/)
+    *   Shows an HLS stream with an Ad POD (multiple ads) inserted as an interstitial at 5 seconds.
+*   **`dash-alt-mpd`**: [Access Example](http://localhost:3000/samples/dash-alt-mpd/)
+    *   Illustrates MPEG-DASH playback using `dash.js` with ads signaled via an alternative MPD (`/api/list-mpd`). Includes CMCD v2 reporting.
+*   **`sample-ad-click`**: [Access Example](http://localhost:3000/samples/sample-ad-click/)
+    *   Focuses on VAST click tracking functionality within an HLS interstitial, using the `videoClicksPlugin.js`.
+*   **`sample-ad-signaling`**: [Access Example](http://localhost:3000/samples/sample-ad-signaling/)
+    *   Demonstrates VAST tracking events (e.g., impression, start, complete) being signaled from an HLS interstitial using `adCreativeSignalingPlugin.js`.
+*   **`sample-api-jwt`**: [Access Example](http://localhost:3000/samples/sample-api-jwt/)
+    *   Shows how to use the `/api/asset-list` endpoint with a JWT to securely provide the VAST URL. Includes an example JWT and the corresponding VAST.
+*   **`sample-api-vastid`**: [Access Example](http://localhost:3000/samples/sample-api-vastid/)
+    *   Demonstrates using the `/api/asset-list` endpoint with the `vastid` parameter, which maps to a pre-configured VAST URL in the server's environment variables.
+*   **`sample-api-vastid-live`**: [Access Example](http://localhost:3000/samples/sample-api-vastid-live/)
+    *   Live HLS stream (Big Buck Bunny restreamed) demonstrating dynamic ad insertion via Wowza Streaming Engine API calls, using `vastid`.
+*   **`sample-api-vastid-live2`**: [Access Example](http://localhost:3000/samples/sample-api-vastid-live2/)
+    *   Similar to `sample-api-vastid-live`, but the live source is a WebRTC stream published to Wowza.
+*   **`sample-api-vastid-live3`**: [Access Example](http://localhost:3000/samples/sample-api-vastid-live3/)
+    *   Live HLS stream from an RTSP camera via Wowza, with dynamic ad insertion using `vastid`.
+*   **`sample-api-vastid-live4`**: [Access Example](http://localhost:3000/samples/sample-api-vastid-live4/)
+    *   Live HLS stream from an RTMP source (e.g., ffmpeg) via Wowza, with dynamic ad insertion using `vastid`.
+*   **`sample-api-vasturl`**: [Access Example](http://localhost:3000/samples/sample-api-vasturl/)
+    *   Shows the use of `/api/asset-list` with the `vasturl` parameter, directly providing the VAST XML URL.
+*   **`sample-edit-vast`**: [Access Example](http://localhost:3000/samples/sample-edit-vast/)
+    *   An interactive demo allowing users to input their own VAST URL and parameters (duration, start date, etc.) to dynamically generate and play an HLS stream with interstitials. It displays the fetched VAST and the parsed AssetList.
+*   **`sample-vast-1`**: [Access Example](http://localhost:3000/samples/sample-vast-1/)
+    *   A basic example showing an HLS stream with an interstitial ad from a VAST XML, similar to `asset-list-1` but structured as a general VAST sample.
+*   **`sample-vast-set/`**: This directory contains a set of VAST XML files (e.g., `vast_01_15s.xml`, `vast_02_30s.xml`) that are used by other examples or can be used for testing. They do not have direct `index.html` players themselves but are referenced by other samples or API calls.
 
----
-
-Feel free to reach out via GitHub or on [video-dev.org](https://video-dev.org) `#montevideo-summerprojects` to get started, contribute, or ask questions. Let's make this tool a valuable resource for the video community!
+These examples are valuable for understanding the capabilities of VAST-2-SGAI and for testing different configurations.
