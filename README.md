@@ -1,40 +1,21 @@
 # VAST-2-SGAI
 
+This project aims to create an open-source tool that converts VAST XML files into HLS interstitial AssetLists and DASH Alternative MPD, supporting Server-Guided Ad Insertion (SGAI).
+
 ## Table of Contents
 
-1.  [Overview](#overview)
-    *   [Introduction](#introduction)
-    *   [Project Goal](#project-goal)
-    *   [Project Duration](#project-duration)
-2.  [How to Run](#how-to-run)
-3.  [Service Configuration](#service-configuration)
-4.  [APIs](#apis)
+1.  [How to Run](#how-to-run)
+2.  [Service Configuration](#service-configuration)
+3.  [APIs](#apis)
     *   [`GET /api/asset-list`](#get-apiasset-list)
     *   [`GET /api/list-mpd`](#get-apilist-mpd)
     *   [`GET / POST /api/sign`](#get--post-apisign)
-5.  [Deployment](#deployment)
+4.  [Deployment](#deployment)
     *   [Using Docker (Recommended)](#using-docker-recommended)
     *   [Using Node.js Directly](#using-nodejs-directly)
     *   [Reverse Proxy (Recommended for Production)](#reverse-proxy-recommended-for-production)
-6.  [Available Examples](#available-examples)
-7.  [Communication Channels](#communication-channels)
-8.  [Methodology](#methodology)
-    *   [Issues](#issues)
-    *   [Weekly Meetings](#weekly-meetings)
-9.  [Documentation](#documentation)
-
-## Overview
-
-### Introduction
-This is a project developed in the context of the **Montevideo TECH Summer Camp 2025**! During the Summer Camp, this project aims to create value for the video community while participants learn and share knowledge, fostering collaborative growth and making a positive impact together on the video community.
-
-### Project Goal
-This project aims to create an open-source tool that converts VAST XML files into HLS interstitial AssetLists, supporting Server-Guided Ad Insertion (SGAI) without requiring Server-Side Ad Insertion (SSAI) providers. 
-
-### Project Duration
-**Start Date:** November 11  
-**End Date:** January 31  
-
+5.  [Available Examples](#available-examples)
+6.  [Communication Channels](#communication-channels)
 
 ## How to run
 
@@ -134,7 +115,7 @@ Converts a VAST XML into an MPEG-DASH MPD of `type="list"`. This MPD will contai
             <ImportedMPD uri="[URL_to_Ad1_MPD]" earliestResolutionTimeOffset="0"/>
           </Period>
           <Period id="2" duration="PT[Ad2Duration]S">
-            <ImportedMPD uri="[URL_to_Ad2_MPD]" earliestResolutionTimeOffset="10"/>
+            <ImportedMPD uri="[URL_to_Ad2_MPD]" earliestResolutionTimeOffset="[Time_to_load]"/>
           </Period>
           <!-- ... more Periods for additional ads ... -->
         </MPD>
@@ -299,38 +280,3 @@ Each example typically includes an `index.html` file that demonstrates a particu
 *   **`sample-vast-set/`**: This directory contains a set of VAST XML files (e.g., `vast_01_15s.xml`, `vast_02_30s.xml`) that are used by other examples or can be used for testing. They do not have direct `index.html` players themselves but are referenced by other samples or API calls.
 
 These examples are valuable for understanding the capabilities of VAST-2-SGAI and for testing different configurations.
-
-## Communication Channels
-
-- **[video-dev.org](https://video-dev.org)**: Join us on the `#montevideo-summerprojects` channel to discuss the project, share updates, and collaborate.
-- **GitHub Repository**: Follow and contribute at [montevideo-tech/vast-2-sgai](https://github.com/montevideo-tech/vast-2-sgai).
-
-## Methodology
-
-We follow a collaborative, issue-driven development approach with regular meetings to discuss ongoing work and new developments.
-
-### Issues
-All topics related to development and design are logged and tracked via GitHub Issues at [Issues Page](https://github.com/montevideo-tech/vast-2-sgai/issues).
-
-1. **Creating Issues**: Participants can create and report issues covering development topics, feature requests, bugs, or any other relevant discussion points.
-2. **Tagging for Discussion**: Issues tagged with `next meeting` will be discussed in the upcoming meeting. Participants should ideally review and comment on these issues beforehand.
-
-### Weekly Meetings
-
-_meetigns MAY vary, please follow the discussions in [video-dev.org](https://video-dev.org) `#montevideo-summerprojects` channel_
-
-- **Frequency**: Every Thursday  
-- **Time**: 9 a.m. PST (12 p.m. EST)
-- **Link**: https://meet.google.com/crh-zrtc-guz
-
-During each meeting:
-1. **Discussion on Tagged Issues**: We’ll focus on issues tagged `next meeting`, aiming to resolve roadblocks and outline actionable steps.
-2. **Preparation**: We encourage each participant to review and comment on tagged issues ahead of time, ensuring an efficient and informed discussion.
-
-## Documentation
-
-**Digital Whiteboard**: A visual tool used during meetings to support discussions can be accessed [here](https://drive.google.com/file/d/1MPodWl1R3DhgWXG54HC3dLo7qD7aTzZT/view?usp=sharing).
-
----
-
-Feel free to reach out via GitHub or on [video-dev.org](https://video-dev.org) `#montevideo-summerprojects` to get started, contribute, or ask questions. Let's make this tool a valuable resource for the video community!
