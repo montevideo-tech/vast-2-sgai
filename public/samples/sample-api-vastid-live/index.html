@@ -94,8 +94,8 @@
       <b>Source: </b>BBB restreamed as live
     </p>
     <span style="display:inline">
-      <button onclick="sendGetRequest('bbb','mystream')">Insert Ad</button>
-      <button onclick="sendDeleteRequest('bbb','mystream')">Remove Ad</button>
+      <button onclick="sendGetRequest('simu-live','myStream')">Insert Ad</button>
+      <button onclick="sendDeleteRequest('simu-live','myStream')">Remove Ad</button>
     </span><br>
     <span><b>API Event: </b><pre id="response" style="display:inline">...</pre></span><br>
     <span><b>Current Time: </b><pre id="time" style="display:inline"></pre></span><br>
@@ -178,7 +178,7 @@
         console.log("INTERSTITIAL_ASSET_ERROR", data);
       });
 
-      hls.loadSource("http://demo.entrypoint.cloud.wowza.com/bbb/mystream/chunklist_w225987628.m3u8?user=1234&content=abc");
+      hls.loadSource("http://localhost/simu-live/myStream/chunklist_w225987628.m3u8?user=1234&content=abc");
 
       hls.attachMedia(video);
       startTime();

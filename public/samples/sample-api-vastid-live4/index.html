@@ -178,7 +178,7 @@
         console.log("INTERSTITIAL_ASSET_ERROR", data);
       });
 
-      hls.loadSource("https://demo.entrypoint.cloud.wowza.com/rtmp/mystream/playlist.m3u8?user=1234&content=abc");
+      hls.loadSource("http://localhost:1935/rtmp/mystream/playlist.m3u8?user=1234&content=abc");
       hls.attachMedia(video);
       startTime();
     }
